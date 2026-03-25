@@ -1,7 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useTransition } from 'react'
 import Link from 'next/link'
+import {
+  getPostsAction,
+  togglePublishAction,
+  getPostContentAction,
+  saveContentAction,
+  resetContentAction,
+} from './actions'
 
 interface Post {
   slug: string
@@ -12,23 +19,15 @@ interface Post {
   published: boolean
 }
 
-interface Section {
-  id: number
-  level: number
-  text: string
-  lineStart: number
-}
+interface Section { id: number; level: number; text: string }
 
 function parseSections(content: string): Section[] {
   const lines = content.split('\n')
   const sections: Section[] = []
   let counter = 0
-  lines.forEach((line, i) => {
+  lines.forEach(line => {
     const match = line.match(/^(#{1,3})\s+(.+)$/)
-    if (match) {
-      counter++
-      sections.push({ id: counter, level: match[1].length, text: match[2], lineStart: i + 1 })
-    }
+    if (match) sections.push({ id: ++counter, level: match[1].length, text: match[2] })
   })
   return sections
 }
@@ -44,89 +43,94 @@ export default function AdminBlogPage() {
   const [savedVersion, setSavedVersion] = useState<number | null>(null)
   const [hasNewerFile, setHasNewerFile] = useState(false)
   const [editLoading, setEditLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
   const [savedMsg, setSavedMsg] = useState('')
-  const [showSections, setShowSections] = useState(false)
+  const [isPending, startTransition] = useTransition()
+  const titleRef = useRef<HTMLInputElement>(null)
 
   async function load() {
     setLoading(true)
-    const res = await fetch('/api/admin/blog')
-    if (!res.ok) { setLoading(false); return }
-    const data = await res.json()
-    setPosts(Array.isArray(data) ? data.sort((a: Post, b: Post) => new Date(b.date).getTime() - new Date(a.date).getTime()) : [])
+    try {
+      const data = await getPostsAction()
+      setPosts(data)
+    } catch { /* unauthorized */ }
     setLoading(false)
   }
 
   useEffect(() => { load() }, [])
 
-  async function toggle(slug: string, current: boolean) {
-    const res = await fetch('/api/admin/blog', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, published: !current }),
-    })
-    if (!res.ok) {
-      alert(`Fehler: ${res.status} — bitte Seite neu laden und nochmal versuchen.`)
-      return
-    }
-    // Optimistic update immediately, then reload
+  function handleToggle(slug: string, current: boolean) {
+    // Optimistic update
     setPosts(prev => prev.map(p => p.slug === slug ? { ...p, published: !current } : p))
-    load()
+    startTransition(async () => {
+      try {
+        await togglePublishAction(slug, !current)
+      } catch {
+        // Revert on error
+        setPosts(prev => prev.map(p => p.slug === slug ? { ...p, published: current } : p))
+        alert('Fehler beim Speichern. Bitte Seite neu laden.')
+      }
+    })
   }
 
   async function openEditor(slug: string, title: string) {
     setEditSlug(slug)
     setEditTitle(title)
-    setShowSections(false)
     setEditLoading(true)
-    const res = await fetch(`/api/admin/blog?slug=${slug}`)
-    const data = await res.json()
-    setFileContent(data.content ?? '')
-    setFileVersion(data.fileVersion ?? 0)
-    setSavedVersion(data.savedVersion ?? null)
-    setHasNewerFile(data.hasNewerFile ?? false)
-    // Show admin's saved version if exists and not outdated, else show file
-    setEditContent(data.adminContent && !data.hasNewerFile ? data.adminContent : data.content)
+    try {
+      const data = await getPostContentAction(slug)
+      setFileContent(data.content)
+      setFileVersion(data.fileVersion)
+      setSavedVersion(data.savedVersion)
+      setHasNewerFile(data.hasNewerFile)
+      setEditContent(data.adminContent && !data.hasNewerFile ? data.adminContent : data.content)
+    } catch { /* error */ }
     setEditLoading(false)
   }
 
-  async function saveEdit() {
+  function handleSave() {
     if (!editSlug) return
-    setSaving(true)
-    await fetch('/api/admin/blog', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug: editSlug, content: editContent, fileVersion }),
+    startTransition(async () => {
+      try {
+        await saveContentAction(editSlug, editContent, fileVersion)
+        setSavedVersion(fileVersion)
+        setHasNewerFile(false)
+        setSavedMsg('✓ Gespeichert')
+        setTimeout(() => setSavedMsg(''), 2500)
+      } catch {
+        alert('Fehler beim Speichern.')
+      }
     })
-    setSavedVersion(fileVersion)
-    setHasNewerFile(false)
-    setSaving(false)
-    setSavedMsg('✓ Gespeichert')
-    setTimeout(() => setSavedMsg(''), 2500)
   }
 
-  async function resetToFile() {
+  function handleReset() {
     if (!editSlug) return
-    setSaving(true)
-    await fetch('/api/admin/blog', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug: editSlug }),
+    startTransition(async () => {
+      try {
+        await resetContentAction(editSlug)
+        setEditContent(fileContent)
+        setHasNewerFile(false)
+        setSavedVersion(null)
+        setSavedMsg('✓ Zurückgesetzt')
+        setTimeout(() => setSavedMsg(''), 2500)
+      } catch {
+        alert('Fehler beim Zurücksetzen.')
+      }
     })
-    setEditContent(fileContent)
-    setHasNewerFile(false)
-    setSavedVersion(null)
-    setSaving(false)
-    setSavedMsg('✓ Neue Version geladen')
-    setTimeout(() => setSavedMsg(''), 2500)
   }
 
   const sections = editContent ? parseSections(editContent) : []
 
-  const inputStyle = {
+  const inputStyle: React.CSSProperties = {
     background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
     borderRadius: '0.5rem', color: 'white', fontSize: '0.875rem', outline: 'none',
+    padding: '0.5rem 0.75rem', width: '100%',
   }
+
+  const btn = (color: string, bg: string, border: string): React.CSSProperties => ({
+    padding: '0.45rem 1rem', borderRadius: '0.375rem', cursor: isPending ? 'not-allowed' : 'pointer',
+    background: bg, border: `1px solid ${border}`, color, fontSize: '0.8rem', fontWeight: 600,
+    opacity: isPending ? 0.6 : 1,
+  })
 
   return (
     <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '3rem 1.5rem' }}>
@@ -139,16 +143,14 @@ export default function AdminBlogPage() {
       {loading ? (
         <p style={{ color: 'rgba(255,255,255,0.4)' }}>Lade...</p>
       ) : posts.length === 0 ? (
-        <div className="glass-card" style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>Noch keine Posts.</div>
+        <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.4)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '1rem' }}>Noch keine Posts.</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {posts.map((post, idx) => {
-            const postNum = posts.length - idx // highest = newest = Blog #N
+            const postNum = posts.length - idx
             return (
-              <div key={post.slug} className="glass-card" style={{ padding: '1.5rem 1.75rem' }}>
+              <div key={post.slug} style={{ padding: '1.5rem 1.75rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '0.875rem' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
-
-                  {/* Post number badge */}
                   <div style={{
                     minWidth: '44px', height: '44px', borderRadius: '0.5rem',
                     background: 'rgba(79,142,247,0.08)', border: '1px solid rgba(79,142,247,0.2)',
@@ -176,26 +178,24 @@ export default function AdminBlogPage() {
                       </span>
                     </div>
                     <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'white', margin: '0 0 0.2rem' }}>{post.title}</h3>
-                    <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)', margin: 0, fontFamily: 'monospace' }}>{post.slug}</p>
+                    <code style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.3)' }}>{post.slug}</code>
                   </div>
 
                   <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, flexWrap: 'wrap', alignItems: 'center' }}>
-                    <button onClick={() => openEditor(post.slug, post.title)} style={{
-                      fontSize: '0.8rem', padding: '0.45rem 1rem', borderRadius: '0.375rem', cursor: 'pointer',
-                      border: '1px solid rgba(79,142,247,0.3)', background: 'rgba(79,142,247,0.08)', color: '#4f8ef7',
-                    }}>✏️ Bearbeiten</button>
-
-                    <Link href={`/blog/${post.slug}`} target="_blank" style={{
-                      fontSize: '0.8rem', padding: '0.45rem 1rem', borderRadius: '0.375rem',
-                      border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
-                    }}>Ansehen ↗</Link>
-
-                    <button onClick={() => toggle(post.slug, post.published)} style={{
-                      fontSize: '0.8rem', padding: '0.45rem 1rem', borderRadius: '0.375rem', cursor: 'pointer', fontWeight: 700,
-                      border: post.published ? '1px solid rgba(248,113,113,0.3)' : '1px solid rgba(34,197,94,0.4)',
-                      background: post.published ? 'rgba(248,113,113,0.08)' : 'rgba(34,197,94,0.12)',
-                      color: post.published ? '#f87171' : '#4ade80',
-                    }}>
+                    <button type="button" onClick={() => openEditor(post.slug, post.title)}
+                      style={btn('#4f8ef7', 'rgba(79,142,247,0.08)', 'rgba(79,142,247,0.3)')}>
+                      ✏️ Bearbeiten
+                    </button>
+                    <Link href={`/blog/${post.slug}`} target="_blank"
+                      style={{ ...btn('rgba(255,255,255,0.6)', 'transparent', 'rgba(255,255,255,0.15)'), textDecoration: 'none', display: 'inline-block' }}>
+                      Ansehen ↗
+                    </Link>
+                    <button type="button" onClick={() => handleToggle(post.slug, post.published)}
+                      style={btn(
+                        post.published ? '#f87171' : '#4ade80',
+                        post.published ? 'rgba(248,113,113,0.08)' : 'rgba(34,197,94,0.12)',
+                        post.published ? 'rgba(248,113,113,0.3)' : 'rgba(34,197,94,0.4)',
+                      )}>
                       {post.published ? 'Deaktivieren' : '✓ Freigeben'}
                     </button>
                   </div>
@@ -208,119 +208,61 @@ export default function AdminBlogPage() {
 
       {/* Edit Modal */}
       {editSlug && (
-        <div style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200,
-          display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-          padding: '2rem 1rem', overflowY: 'auto',
-        }} onClick={e => { if (e.target === e.currentTarget) setEditSlug(null) }}>
-          <div style={{
-            background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem',
-            width: '100%', maxWidth: '960px', padding: '2rem',
-            position: 'relative', zIndex: 201,
-          }} onClick={e => e.stopPropagation()}>
-            {/* Modal header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', gap: '1rem' }}>
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 200, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '2rem 1rem', overflowY: 'auto' }}
+          onClick={e => { if (e.target === e.currentTarget) setEditSlug(null) }}
+        >
+          <div style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem', width: '100%', maxWidth: '960px', padding: '2rem', position: 'relative', zIndex: 201 }}
+            onClick={e => e.stopPropagation()}>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
               <div>
                 <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: '0 0 0.2rem' }}>{editTitle}</h2>
                 <code style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)' }}>{editSlug}</code>
               </div>
-              <button type="button" onClick={() => setEditSlug(null)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '1.25rem', cursor: 'pointer', flexShrink: 0 }}>✕</button>
+              <button type="button" onClick={() => setEditSlug(null)}
+                style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: '1.25rem', cursor: 'pointer' }}>✕</button>
             </div>
 
             {editLoading ? <p style={{ color: 'rgba(255,255,255,0.4)' }}>Lade...</p> : (
               <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
-
-                {/* Editor */}
                 <div style={{ flex: 1 }}>
-                  {/* Version banner */}
                   {hasNewerFile && (
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap',
-                      padding: '0.75rem 1rem', marginBottom: '0.75rem',
-                      background: 'rgba(79,142,247,0.08)', border: '1px solid rgba(79,142,247,0.25)',
-                      borderRadius: '0.5rem', fontSize: '0.82rem',
-                    }}>
-                      <span style={{ color: '#4f8ef7' }}>🆕 Jarvis hat eine neue Version geschrieben (v{fileVersion}). Du siehst gerade diese neue Version.</span>
-                    </div>
-                  )}
-                  {!hasNewerFile && savedVersion !== null && (
-                    <div style={{
-                      padding: '0.5rem 1rem', marginBottom: '0.75rem',
-                      background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)',
-                      borderRadius: '0.5rem', fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)',
-                    }}>
-                      Du bearbeitest deine eigene Version (gespeichert bei Datei-v{savedVersion})
+                    <div style={{ padding: '0.75rem 1rem', marginBottom: '0.75rem', background: 'rgba(79,142,247,0.08)', border: '1px solid rgba(79,142,247,0.25)', borderRadius: '0.5rem', fontSize: '0.82rem', color: '#4f8ef7' }}>
+                      🆕 Jarvis hat eine neue Version (v{fileVersion}) — du siehst sie bereits.
                     </div>
                   )}
                   <textarea
                     value={editContent}
                     onChange={e => setEditContent(e.target.value)}
-                    style={{
-                      ...inputStyle, width: '100%', minHeight: '520px', padding: '1rem',
-                      resize: 'vertical', lineHeight: 1.6, fontFamily: 'monospace', fontSize: '0.85rem',
-                    }}
+                    style={{ ...inputStyle, minHeight: '500px', resize: 'vertical', lineHeight: 1.6, fontFamily: 'monospace', fontSize: '0.85rem' }}
                   />
                   <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <button
-                      type="button"
-                      onClick={saveEdit}
-                      disabled={saving}
-                      style={{
-                        padding: '0.6rem 1.5rem', borderRadius: '0.5rem', cursor: saving ? 'not-allowed' : 'pointer',
-                        background: 'linear-gradient(135deg, #4f8ef7, #7c6cf7)',
-                        border: 'none', color: 'white', fontWeight: 700, fontSize: '0.875rem',
-                        opacity: saving ? 0.7 : 1,
-                      }}
-                    >
-                      {saving ? '...' : 'Speichern'}
+                    <button type="button" onClick={handleSave} disabled={isPending}
+                      style={{ padding: '0.6rem 1.5rem', borderRadius: '0.5rem', cursor: isPending ? 'not-allowed' : 'pointer', background: 'linear-gradient(135deg, #4f8ef7, #7c6cf7)', border: 'none', color: 'white', fontWeight: 700, fontSize: '0.875rem', opacity: isPending ? 0.7 : 1 }}>
+                      {isPending ? '...' : 'Speichern'}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setEditSlug(null)}
-                      style={{
-                        padding: '0.6rem 1.25rem', borderRadius: '0.5rem', cursor: 'pointer',
-                        background: 'transparent', border: '1px solid rgba(255,255,255,0.2)',
-                        color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem',
-                      }}
-                    >
+                    <button type="button" onClick={() => setEditSlug(null)}
+                      style={{ padding: '0.6rem 1.25rem', borderRadius: '0.5rem', cursor: 'pointer', background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem' }}>
                       Schließen
                     </button>
-                    <button
-                      type="button"
-                      onClick={resetToFile}
-                      disabled={saving}
-                      style={{
-                        padding: '0.6rem 1.25rem', borderRadius: '0.5rem', cursor: 'pointer',
-                        background: 'transparent', border: '1px solid rgba(248,113,113,0.3)',
-                        color: '#f87171', fontSize: '0.8rem',
-                      }}
-                    >
-                      ↺ Auf Original zurücksetzen
+                    <button type="button" onClick={handleReset} disabled={isPending}
+                      style={{ padding: '0.6rem 1.25rem', borderRadius: '0.5rem', cursor: 'pointer', background: 'transparent', border: '1px solid rgba(248,113,113,0.3)', color: '#f87171', fontSize: '0.8rem' }}>
+                      ↺ Zurücksetzen
                     </button>
                     {savedMsg && <span style={{ color: '#4ade80', fontSize: '0.875rem' }}>{savedMsg}</span>}
                   </div>
                 </div>
 
-                {/* Sections panel */}
                 <div style={{ width: '220px', flexShrink: 0 }}>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>
-                    Abschnitte
-                  </div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>Abschnitte</div>
                   {sections.length === 0 ? (
-                    <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.25)' }}>Keine Überschriften gefunden.</p>
+                    <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.25)' }}>Keine Überschriften.</p>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                       {sections.map(s => (
-                        <div key={s.id} style={{
-                          display: 'flex', alignItems: 'flex-start', gap: '0.5rem',
-                          padding: '0.4rem 0.6rem',
-                          background: 'rgba(255,255,255,0.03)',
-                          border: '1px solid rgba(255,255,255,0.06)',
-                          borderLeft: `2px solid ${s.level === 1 ? '#4f8ef7' : s.level === 2 ? '#a78bfa' : 'rgba(255,255,255,0.2)'}`,
-                          borderRadius: '0 0.375rem 0.375rem 0',
-                          paddingLeft: `${(s.level - 1) * 0.5 + 0.6}rem`,
-                        }}>
-                          <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#4f8ef7', flexShrink: 0, marginTop: '1px' }}>#{s.id}</span>
+                        <div key={s.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', padding: '0.4rem 0.6rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderLeft: `2px solid ${s.level === 1 ? '#4f8ef7' : s.level === 2 ? '#a78bfa' : 'rgba(255,255,255,0.2)'}`, borderRadius: '0 0.375rem 0.375rem 0', paddingLeft: `${(s.level - 1) * 0.5 + 0.6}rem` }}>
+                          <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#4f8ef7', flexShrink: 0 }}>#{s.id}</span>
                           <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.6)', lineHeight: 1.4 }}>{s.text}</span>
                         </div>
                       ))}
@@ -328,8 +270,7 @@ export default function AdminBlogPage() {
                   )}
                   <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(79,142,247,0.06)', border: '1px solid rgba(79,142,247,0.15)', borderRadius: '0.5rem' }}>
                     <p style={{ fontSize: '0.73rem', color: 'rgba(255,255,255,0.4)', margin: 0, lineHeight: 1.5 }}>
-                      Sag mir z.B.:<br />
-                      <em style={{ color: 'rgba(79,142,247,0.8)' }}>„Blog #2, Abschnitt 3 — schreib das kürzer"</em>
+                      Sag mir z.B.:<br /><em style={{ color: 'rgba(79,142,247,0.8)' }}>„Blog #2, Abschnitt 3 — kürzer"</em>
                     </p>
                   </div>
                 </div>
