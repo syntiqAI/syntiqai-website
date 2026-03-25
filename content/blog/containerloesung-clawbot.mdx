@@ -1,132 +1,49 @@
 ---
-title: "Warum wir auf Container setzen — Architektur-Entscheidungen für den ClawBot"
-description: "Wie Docker-Container unsere KI-Agenten isoliert, skalierbar und DSGVO-konform machen — und warum das für KMUs der richtige Ansatz ist."
+title: "Warum wir auf Container setzen"
+description: "Unsere Überlegungen zur Infrastruktur hinter dem ClawBot — und warum Isolation keine Option, sondern eine Grundvoraussetzung ist."
 date: "2026-03-25"
-author: "Jarvis"
+author: "Thomas Zach"
 published: false
 image: "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=900&q=80"
-imageAlt: "Serverracks und Netzwerkinfrastruktur in einem modernen Rechenzentrum"
+imageAlt: "Moderne Serverinfrastruktur"
 ---
 
-Wenn man ein KI-System für mehrere Unternehmen und mehrere Mitarbeiter baut, stellt sich früh eine fundamentale Frage: Wie stellt man sicher, dass die Daten von Firma A niemals zu Firma B gelangen? Und wie skaliert man das Ganze, ohne dabei den Überblick zu verlieren?
+Wenn man KI-Agenten für mehrere Unternehmen betreibt, stellt sich früh eine entscheidende Frage: Wie stellt man sicher, dass die Daten von Firma A niemals zu Firma B gelangen?
 
-Unsere Antwort: **ein Container pro Agent**.
+Unsere Antwort ist einfach: **vollständige Isolation von Anfang an**.
 
-## Warum Container?
+## Warum Isolation so wichtig ist
 
-Die klassische Antwort wäre: wegen der Skalierung. Das stimmt — aber bei uns war der eigentliche Auslöser die **Datenisolation**.
+Stell dir vor, du betreibst Agenten für eine Steuerberatungskanzlei und eine Arztpraxis auf derselben Plattform. Ein Bug, eine Fehlkonfiguration — und plötzlich sieht der falsche Agent die falschen Daten.
 
-Stell dir vor, du betreibst KI-Agenten für eine Steuerberatungskanzlei und eine Arztpraxis auf demselben System. Beide Agenten teilen sich eine Anwendung, eine Datenbank, einen Prozess. Ein Bug, eine Fehlkonfiguration, ein unachtsamer API-Call — und plötzlich sieht Agent A Daten von Klient B.
+Das darf strukturell nicht möglich sein. Nicht als Edge Case, nicht als "sehr unwahrscheinlich". Einfach nicht.
 
-Mit Containern passiert das strukturell nicht. Jeder Agent läuft in seiner eigenen, vollständig isolierten Umgebung. Kein geteilter Speicher, kein geteiltes Dateisystem, kein geteiltes Netzwerk — außer genau dem, was explizit erlaubt wird.
+Deshalb ist unser Ansatz: jeder Agent lebt in seiner eigenen, vollständig abgeschotteten Umgebung. Kein geteilter Speicher, kein geteiltes Netzwerk — außer genau dem, was explizit erlaubt wird. Das ist keine technische Spielerei, das ist eine **DSGVO-Garantie**.
 
-Das ist nicht nur ein technisches Feature. Das ist eine DSGVO-Garantie.
+## Schnelles Onboarding statt komplizierter Einrichtung
 
-## Die Architektur im Überblick
+Ein weiterer Vorteil: Einen neuen Agenten aufzusetzen dauert Minuten, nicht Tage. Name, Rolle, ein paar Eckdaten zum Unternehmen — fertig. Der Agent ist sofort einsatzbereit und kennt seinen Kontext.
 
-Unser aktueller Aufbau für den Pilot:
+Genauso schnell geht das Gegenteil: Wenn ein Mitarbeiter das Unternehmen verlässt, ist sein Agent weg. Vollständig, rückstandsfrei, DSGVO-konform.
 
-```
-Proxmox (Heimserver, Baden)
-└── VM: Ubuntu 24.04 + Docker
-    ├── Container: Agent "Flo"     (techflow IT-Solutions)
-    ├── Container: Agent "Thomas"  (SyntiqAI intern)
-    └── Container: Shared Services (Logging, Monitoring)
-```
+## LLM-Backend: Europa first
 
-Jeder Agent-Container enthält:
-- **OpenClaw** als Agent-Runtime
-- **Workspace-Ordner** mit SOUL.md, MEMORY.md, USER.md (individuell pro Agent)
-- **Umgebungsvariablen** für LLM-Backend, Telegram/WhatsApp-Token
+Wir starten mit europäischen Cloud-Diensten — Datenspeicherung bleibt in der EU, kein Umweg über US-Server. Langfristig wollen wir auch vollständig lokale Modelle anbieten, sobald die Hardware-Kosten das realistisch machen.
 
-Der geteilte Speicher (`/shared/`) enthält nur explizit freigegebene Firmeninformationen — und wird pro Container mit Read-only- oder Read-write-Berechtigungen eingehängt.
+Das Prinzip: Das KI-Modell im Hintergrund ist austauschbar. Was bleibt, ist die Logik drum herum.
 
-## Das ClawBot Base Template
+## Kommunikation: Weg vom Big-Tech-Lock-in
 
-Der Kern unseres Produkts ist ein **Docker-Image** das als Vorlage für jeden neuen Agenten dient. Es enthält eine vordefinierte Workspace-Struktur:
+Aktuell erreichen Mitarbeiter ihren Agenten via **WhatsApp oder Telegram** — das funktioniert gut und braucht keine App-Installation. Aber langfristig wollen wir uns nicht von großen Plattformen abhängig machen.
 
-```
-/workspace/
-├── SOUL.md        ← Persönlichkeit & Ton (anpassbar)
-├── IDENTITY.md    ← Name, Rolle, Emoji (individuell)
-├── MEMORY.md      ← Routing & Regeln (Basis-Template)
-├── AGENTS.md      ← Verhaltensregeln
-├── USER.md        ← Mitarbeiter-Infos (beim Onboarding befüllt)
-└── memory/
-    └── shared/    ← Gemountetes Shared Volume
-```
+Wir interessieren uns für offene Alternativen: selbst gehostete Messaging-Lösungen, Ende-zu-Ende-Verschlüsselung, keine Datenweitergabe an Dritte. Die Kommunikationsschicht soll in Zukunft genauso austauschbar sein wie das LLM-Backend.
 
-Neuen Agent anlegen? Drei Schritte:
-1. Name und Rolle eingeben → `IDENTITY.md` und `USER.md` werden automatisch generiert
-2. LLM-Backend via Environment Variables konfigurieren (Azure / Mistral / Ollama)
-3. Container starten → Agent ist bereit
+## Noch ist vieles offen
 
-Onboarding eines neuen Mitarbeiters: **unter 5 Minuten**.
+Das hier ist kein fertiges Produkt — es ist ein Projekt in Bewegung. Wir probieren, lernen, bauen um. Was heute so aussieht, kann nächste Woche anders sein.
 
-## LLM-Backend: Azure zuerst, lokal später
+Was sich nicht ändert: der Ansatz. Datenschutz ist kein Feature, das man nachträglich einbaut. Er muss von Anfang an drin sein.
 
-Eine häufige Frage: warum nicht gleich lokal mit Ollama?
+Wenn dich das interessiert — meld dich gerne. Ich freue mich über Austausch.
 
-Weil ein lokaler GPU-Server für Mistral 7B zwischen 800 und 2.000 Euro kostet — und das ist für ein MVP zu viel Risiko. Wir beginnen mit **Azure OpenAI**:
-
-- Europäische Datenspeicherung (Rechenzentrum Netherlands/Sweden)
-- Pay-as-you-go — keine Fixkosten
-- DSGVO-konform durch EU Data Boundary
-- Sofort einsatzbereit
-
-Sobald ein Kunde zahlt und der Bedarf da ist, kommt **Mistral via Ollama** auf dedizierter Hardware. Die Architektur ist von Anfang an so gebaut, dass der Wechsel des LLM-Backends eine einzelne Umgebungsvariable ist.
-
-## RBAC: Wer darf was sehen?
-
-Nicht alle Informationen im Unternehmen sind für alle Mitarbeiter bestimmt. Unser Ansatz: jede Datei im Shared Storage bekommt ein Klassifizierungs-Tag.
-
-```
-🟢 PUBLIC     → alle Mitarbeiter
-🟡 INTERNAL   → alle Mitarbeiter, kein externer Zugriff
-🔴 HR         → nur HR und Geschäftsführung
-🔴 MANAGEMENT → nur Geschäftsführung
-```
-
-Beim Zugriff auf Firmendaten prüft der Agent: **darf ich das sehen?** Erst dann wird die Information ausgegeben.
-
-Das ist unser stärkster Vorteil gegenüber Microsoft Copilot, bei dem SharePoint-Berechtigungsfehler regelmäßig zu Datenlecks führen. Wir bauen Zugriffskontrolle von Grund auf ein — nicht als nachträgliches Feature.
-
-## Der Weg nach vorne
-
-Der aktuelle Pilot läuft auf unserem Proxmox-Homeserver in Baden. Das skaliert nicht für hundert Kunden — und soll es auch nicht. Es ist ein **Proof of Concept**.
-
-Der geplante Skalierungspfad:
-
-| Phase | Infrastruktur | Wann |
-|-------|--------------|------|
-| 1 | Docker Compose auf Proxmox | Jetzt |
-| 2 | Azure Container Apps | Erste zahlende Kunden |
-| 3 | OpenShift (Enterprise) | Auf Anfrage |
-
-Jede Phase ist abwärtskompatibel. Was auf Proxmox läuft, läuft auch in der Cloud — weil es Container sind.
-
-## Kommunikation: Raus aus dem Big-Tech-Lock-in
-
-Aktuell erreichen Mitarbeiter ihren Agenten via **WhatsApp oder Telegram** — beides funktioniert gut und braucht keine App-Installation. Aber langfristig wollen wir uns nicht von Meta oder Telegram abhängig machen.
-
-Wir arbeiten deshalb aktiv an offenen Alternativen:
-
-**Matrix / Element** ist der vielversprechendste Kandidat. Ein offenes, dezentrales Protokoll — selbst hostbar, Ende-zu-Ende-verschlüsselt, API-freundlich. Kein amerikanischer Konzern im Hintergrund, keine Datenweitergabe, kein Vendor Lock-in. Unsere eigene Matrix-Instanz läuft bereits auf dem Proxmox-Server und wird für interne Kommunikation evaluiert.
-
-**Signal** ist eine weitere Option für datenschutzsensible Kunden — besonders in Gesundheitsberufen oder Rechtsberatung, wo Vertraulichkeit gesetzlich vorgeschrieben ist.
-
-**Offene Web-App** als Langfristziel: Ein direktes Chat-Interface das ohne externe Messenger auskommt und direkt im Browser oder als PWA läuft. Kein Drittanbieter, kein Account bei Meta nötig.
-
-Das Prinzip dahinter: Wir bauen auf offene Standards. Was heute über Telegram läuft, soll morgen über Matrix oder eine eigene Lösung laufen können — **ohne den Agenten neu zu konfigurieren**. Die Kommunikationsschicht ist austauschbar.
-
-## Fazit
-
-Container sind für uns keine technische Spielerei. Sie sind die Grundlage für ein Produkt das wir mit gutem Gewissen an österreichische KMUs verkaufen können: **isoliert, nachvollziehbar, löschbar**.
-
-Jeder Agent läuft in seiner Sandbox. Jedes Unternehmen hat seine eigene Umgebung. Und wenn ein Mitarbeiter das Unternehmen verlässt, ist sein Agent in Sekunden weg — DSGVO-konform, vollständig, ohne Rückstände.
-
-Die Kommunikation? Offen, austauschbar, ohne Big-Tech-Abhängigkeit.
-
-Das ist die Infrastruktur hinter dem ClawBot. Und wir bauen sie gerade.
-
-— Jarvis
+— Thomas
