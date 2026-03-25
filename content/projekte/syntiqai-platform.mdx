@@ -1,0 +1,74 @@
+---
+title: "SyntiqAI Platform — Multi-Agent Workspace"
+description: "Eine kollaborative Plattform wo KI-Agenten zusammenarbeiten, Aufgaben per Drag & Drop delegiert werden und Teams von KI-Unterstützung profitieren — ohne Big-Tech-Abhängigkeit."
+date: "2026-03-25"
+status: "Planung"
+version: 1
+image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=1200&q=80"
+imageAlt: "Digitales Board mit vernetzten Elementen"
+---
+
+## Die Idee
+
+Ein Arbeitsplatz für KI-Agenten — selbst gehostet, offen, kollaborativ.
+
+Nicht ein einzelner Chatbot der Fragen beantwortet, sondern ein System wo mehrere Agenten zusammenarbeiten. Jeder Agent hat seine Stärken, seinen Kontext, seine Rolle. Gemeinsam erledigen sie Aufgaben die für eine einzelne Person zu viel wären.
+
+---
+
+## Was die Platform können soll
+
+### Task-Board (Drag & Drop)
+
+Ein visuelles Board — vergleichbar mit Trello — wo Aufgaben angelegt, priorisiert und per Drag & Drop einem Agenten zugewiesen werden können.
+
+Der Agent übernimmt die Aufgabe, arbeitet sie ab und schreibt das Ergebnis zurück ins Board. Kein manuelles Nachfragen, kein Kopieren von Antworten aus dem Chat.
+
+### Multi-Agent Zusammenarbeit
+
+Für komplexere Aufgaben: mehrere Agenten arbeiten parallel an einem Thema. Einer recherchiert, einer schreibt, einer reviewt. Das Ergebnis kommt als fertiges Dokument zurück.
+
+### Direkter Chat pro Agent
+
+Jeder Mitarbeiter hat seinen eigenen Agenten und einen direkten Chat damit — über die App, nicht über WhatsApp oder Telegram. Selbst gehostet, Ende-zu-Ende, keine Daten bei Dritten.
+
+### Admin-Übersicht
+
+Wer hat welche Aufgaben laufen? Welcher Agent ist ausgelastet? Was wurde diese Woche erledigt? Eine Übersicht für den Admin ohne in jeden einzelnen Chat schauen zu müssen.
+
+---
+
+## Technische Basis
+
+Die Plattform baut auf offenen Standards:
+
+- **Matrix-Protokoll** für die Kommunikation zwischen Agenten und Nutzern
+- **Selbst gehosteter Matrix-Server** (Synapse) — keine Cloud-Abhängigkeit
+- **OpenClaw** als Agent-Runtime
+- **Eigene Web-App** als Frontend — kein externer Messenger nötig
+
+---
+
+## Roadmap
+
+### Phase 1 — Fundament (aktuell)
+Stabiler Betrieb einzelner Agenten. Matrix-Server live. Jeder Agent hat seinen eigenen Raum.
+
+### Phase 2 — Task-System
+Einfache Aufgabenliste pro Agent. Zuweisung über die Web-App. Ergebnisse werden zurückgeschrieben.
+
+### Phase 3 — Board UI
+Visuelles Drag & Drop Board. Mehrere Agenten gleichzeitig sichtbar. Status pro Aufgabe.
+
+### Phase 4 — Multi-Agent Workflows
+Agenten koordinieren sich untereinander. Komplexe mehrstufige Aufgaben werden automatisch verteilt.
+
+---
+
+## Warum das wichtig ist
+
+Große Unternehmen haben Abteilungen. Kleine Unternehmen haben oft eine Person die alles macht.
+
+KI-Agenten die miteinander arbeiten, sind kein Luxus — sie sind eine Antwort auf das Problem dass gute Arbeit Zeit braucht die oft nicht da ist.
+
+Das hier ist der Versuch, das zu ändern. Ohne Abhängigkeit von großen Plattformen. Ohne monatliche Lizenzkosten pro Mitarbeiter die schnell explodieren. Selbst gebaut, selbst kontrolliert.
