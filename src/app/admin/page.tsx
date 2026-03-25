@@ -27,6 +27,7 @@ export default async function AdminPage() {
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
         {[
           { href: '/admin/blog', label: '✍️ Blog-Verwaltung', desc: 'Entwürfe freigeben' },
+          { href: '/admin/tasks', label: '📋 Aufgaben', desc: 'Task-Board' },
           { href: '/admin/settings', label: '⚙️ Einstellungen', desc: 'Profil & Passwort' },
         ].map(item => (
           <Link key={item.href} href={item.href} className="glass-card" style={{ padding: '1rem 1.5rem', textDecoration: 'none', flex: '1', minWidth: '180px' }}>

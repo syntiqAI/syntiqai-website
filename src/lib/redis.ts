@@ -56,6 +56,43 @@ export async function deleteSubscriber(id: string): Promise<void> {
   await redis.srem('newsletter:ids', id)
 }
 
+// ─── Tasks ───────────────────────────────────────────────────────────────────
+
+export type TaskColumn = 'backlog' | 'inprogress' | 'done'
+export type TaskPriority = 'low' | 'medium' | 'high'
+
+export interface Task {
+  id: string
+  title: string
+  description?: string
+  assignedAgent?: string
+  priority: TaskPriority
+  column: TaskColumn
+  createdAt: string
+  updatedAt: string
+}
+
+export async function getAllTasks(): Promise<Task[]> {
+  const keys = await redis.keys('task:*')
+  if (!keys.length) return []
+  const tasks = await Promise.all(keys.map(k => redis.get<Task>(k)))
+  return tasks.filter(Boolean) as Task[]
+}
+
+export async function createTask(task: Task): Promise<void> {
+  await redis.set(`task:${task.id}`, task)
+}
+
+export async function updateTask(id: string, updates: Partial<Task>): Promise<void> {
+  const existing = await redis.get<Task>(`task:${id}`)
+  if (!existing) return
+  await redis.set(`task:${id}`, { ...existing, ...updates, updatedAt: new Date().toISOString() })
+}
+
+export async function deleteTask(id: string): Promise<void> {
+  await redis.del(`task:${id}`)
+}
+
 // ─── Blog Publication ────────────────────────────────────────────────────────
 
 export async function getBlogPublishStatus(slug: string): Promise<boolean | null> {
