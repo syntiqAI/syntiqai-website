@@ -1,5 +1,4 @@
-import fs from 'fs'
-import path from 'path'
+import { redis } from './redis'
 
 export interface Author {
   id: string
@@ -8,31 +7,26 @@ export interface Author {
   avatarUrl: string
   email: string
   role: string
+  [key: string]: unknown
 }
 
-const authorsDir = path.join(process.cwd(), 'content/authors')
+const DEFAULTS: Record<string, Author> = {
+  thomas: {
+    id: 'thomas', name: 'Thomas Zach', role: 'Gründer & CEO',
+    bio: 'Gründer von SyntiqAI. Software Asset Manager mit Leidenschaft für AI & Automation. Baut Tools die KMUs wirklich helfen.',
+    avatarUrl: '', email: 'thomas@syntiq-ai.at',
+  },
+  jarvis: {
+    id: 'jarvis', name: 'Jarvis', role: 'AI Assistent',
+    bio: 'Der digitale Assistent von SyntiqAI. Multi-Agent AI System auf Basis von OpenClaw & Claude. Schreibt, recherchiert, und baut mit.',
+    avatarUrl: '', email: 'jarvis@syntiq-ai.at',
+  },
+}
 
-export function getAuthor(id: string): Author | null {
-  // Check Redis-overridden profile first
+export async function getAuthor(id: string): Promise<Author | null> {
   try {
-    const filePath = path.join(authorsDir, `${id}.json`)
-    if (!fs.existsSync(filePath)) return null
-    return JSON.parse(fs.readFileSync(filePath, 'utf8')) as Author
-  } catch {
-    return null
-  }
-}
-
-export function getAllAuthors(): Author[] {
-  if (!fs.existsSync(authorsDir)) return []
-  return fs.readdirSync(authorsDir)
-    .filter(f => f.endsWith('.json'))
-    .map(f => {
-      try {
-        return JSON.parse(fs.readFileSync(path.join(authorsDir, f), 'utf8')) as Author
-      } catch {
-        return null
-      }
-    })
-    .filter(Boolean) as Author[]
+    const stored = await redis.hgetall<Author>(`author:${id}`)
+    if (stored && Object.keys(stored).length > 0) return stored
+  } catch { /* fall through to default */ }
+  return DEFAULTS[id] ?? null
 }

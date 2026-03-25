@@ -1,31 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth-server'
-import { setAdminProfile } from '@/lib/redis'
-import fs from 'fs'
-import path from 'path'
+import { redis } from '@/lib/redis'
+
+const DEFAULT_PROFILE = {
+  id: 'thomas',
+  name: 'Thomas Zach',
+  bio: 'Gründer von SyntiqAI. Software Asset Manager mit Leidenschaft für AI & Automation.',
+  avatarUrl: '',
+  email: 'thomas@syntiq-ai.at',
+  role: 'Gründer & CEO',
+}
 
 export async function GET() {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  try {
-    const filePath = path.join(process.cwd(), 'content/authors/thomas.json')
-    return NextResponse.json(JSON.parse(fs.readFileSync(filePath, 'utf8')))
-  } catch {
-    return NextResponse.json({})
-  }
+  const stored = await redis.hgetall('author:thomas')
+  return NextResponse.json(stored && Object.keys(stored).length > 0 ? stored : DEFAULT_PROFILE)
 }
 
 export async function PATCH(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const updates = await req.json()
-  try {
-    const filePath = path.join(process.cwd(), 'content/authors/thomas.json')
-    const current = JSON.parse(fs.readFileSync(filePath, 'utf8'))
-    fs.writeFileSync(filePath, JSON.stringify({ ...current, ...updates }, null, 2))
-    await setAdminProfile(updates)
-    return NextResponse.json({ success: true })
-  } catch {
-    return NextResponse.json({ error: 'Fehler beim Speichern' }, { status: 500 })
-  }
+  const current = await redis.hgetall('author:thomas') ?? DEFAULT_PROFILE
+  const merged = { ...current, ...updates }
+  await redis.hset('author:thomas', merged as Record<string, string>)
+  return NextResponse.json({ success: true })
 }
