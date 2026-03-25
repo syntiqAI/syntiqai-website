@@ -1,0 +1,116 @@
+---
+title: "Warum wir auf Container setzen — Architektur-Entscheidungen für den ClawBot"
+description: "Wie Docker-Container unsere KI-Agenten isoliert, skalierbar und DSGVO-konform machen — und warum das für KMUs der richtige Ansatz ist."
+date: "2026-03-25"
+author: "Jarvis"
+published: false
+image: "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=900&q=80"
+imageAlt: "Serverracks und Netzwerkinfrastruktur in einem modernen Rechenzentrum"
+---
+
+Wenn man ein KI-System für mehrere Unternehmen und mehrere Mitarbeiter baut, stellt sich früh eine fundamentale Frage: Wie stellt man sicher, dass die Daten von Firma A niemals zu Firma B gelangen? Und wie skaliert man das Ganze, ohne dabei den Überblick zu verlieren?
+
+Unsere Antwort: **ein Container pro Agent**.
+
+## Warum Container?
+
+Die klassische Antwort wäre: wegen der Skalierung. Das stimmt — aber bei uns war der eigentliche Auslöser die **Datenisolation**.
+
+Stell dir vor, du betreibst KI-Agenten für eine Steuerberatungskanzlei und eine Arztpraxis auf demselben System. Beide Agenten teilen sich eine Anwendung, eine Datenbank, einen Prozess. Ein Bug, eine Fehlkonfiguration, ein unachtsamer API-Call — und plötzlich sieht Agent A Daten von Klient B.
+
+Mit Containern passiert das strukturell nicht. Jeder Agent läuft in seiner eigenen, vollständig isolierten Umgebung. Kein geteilter Speicher, kein geteiltes Dateisystem, kein geteiltes Netzwerk — außer genau dem, was explizit erlaubt wird.
+
+Das ist nicht nur ein technisches Feature. Das ist eine DSGVO-Garantie.
+
+## Die Architektur im Überblick
+
+Unser aktueller Aufbau für den Pilot:
+
+```
+Proxmox (Heimserver, Baden)
+└── VM: Ubuntu 24.04 + Docker
+    ├── Container: Agent "Flo"     (techflow IT-Solutions)
+    ├── Container: Agent "Thomas"  (SyntiqAI intern)
+    └── Container: Shared Services (Logging, Monitoring)
+```
+
+Jeder Agent-Container enthält:
+- **OpenClaw** als Agent-Runtime
+- **Workspace-Ordner** mit SOUL.md, MEMORY.md, USER.md (individuell pro Agent)
+- **Umgebungsvariablen** für LLM-Backend, Telegram/WhatsApp-Token
+
+Der geteilte Speicher (`/shared/`) enthält nur explizit freigegebene Firmeninformationen — und wird pro Container mit Read-only- oder Read-write-Berechtigungen eingehängt.
+
+## Das ClawBot Base Template
+
+Der Kern unseres Produkts ist ein **Docker-Image** das als Vorlage für jeden neuen Agenten dient. Es enthält eine vordefinierte Workspace-Struktur:
+
+```
+/workspace/
+├── SOUL.md        ← Persönlichkeit & Ton (anpassbar)
+├── IDENTITY.md    ← Name, Rolle, Emoji (individuell)
+├── MEMORY.md      ← Routing & Regeln (Basis-Template)
+├── AGENTS.md      ← Verhaltensregeln
+├── USER.md        ← Mitarbeiter-Infos (beim Onboarding befüllt)
+└── memory/
+    └── shared/    ← Gemountetes Shared Volume
+```
+
+Neuen Agent anlegen? Drei Schritte:
+1. Name und Rolle eingeben → `IDENTITY.md` und `USER.md` werden automatisch generiert
+2. LLM-Backend via Environment Variables konfigurieren (Azure / Mistral / Ollama)
+3. Container starten → Agent ist bereit
+
+Onboarding eines neuen Mitarbeiters: **unter 5 Minuten**.
+
+## LLM-Backend: Azure zuerst, lokal später
+
+Eine häufige Frage: warum nicht gleich lokal mit Ollama?
+
+Weil ein lokaler GPU-Server für Mistral 7B zwischen 800 und 2.000 Euro kostet — und das ist für ein MVP zu viel Risiko. Wir beginnen mit **Azure OpenAI**:
+
+- Europäische Datenspeicherung (Rechenzentrum Netherlands/Sweden)
+- Pay-as-you-go — keine Fixkosten
+- DSGVO-konform durch EU Data Boundary
+- Sofort einsatzbereit
+
+Sobald ein Kunde zahlt und der Bedarf da ist, kommt **Mistral via Ollama** auf dedizierter Hardware. Die Architektur ist von Anfang an so gebaut, dass der Wechsel des LLM-Backends eine einzelne Umgebungsvariable ist.
+
+## RBAC: Wer darf was sehen?
+
+Nicht alle Informationen im Unternehmen sind für alle Mitarbeiter bestimmt. Unser Ansatz: jede Datei im Shared Storage bekommt ein Klassifizierungs-Tag.
+
+```
+🟢 PUBLIC     → alle Mitarbeiter
+🟡 INTERNAL   → alle Mitarbeiter, kein externer Zugriff
+🔴 HR         → nur HR und Geschäftsführung
+🔴 MANAGEMENT → nur Geschäftsführung
+```
+
+Beim Zugriff auf Firmendaten prüft der Agent: **darf ich das sehen?** Erst dann wird die Information ausgegeben.
+
+Das ist unser stärkster Vorteil gegenüber Microsoft Copilot, bei dem SharePoint-Berechtigungsfehler regelmäßig zu Datenlecks führen. Wir bauen Zugriffskontrolle von Grund auf ein — nicht als nachträgliches Feature.
+
+## Der Weg nach vorne
+
+Der aktuelle Pilot läuft auf unserem Proxmox-Homeserver in Baden. Das skaliert nicht für hundert Kunden — und soll es auch nicht. Es ist ein **Proof of Concept**.
+
+Der geplante Skalierungspfad:
+
+| Phase | Infrastruktur | Wann |
+|-------|--------------|------|
+| 1 | Docker Compose auf Proxmox | Jetzt |
+| 2 | Azure Container Apps | Erste zahlende Kunden |
+| 3 | OpenShift (Enterprise) | Auf Anfrage |
+
+Jede Phase ist abwärtskompatibel. Was auf Proxmox läuft, läuft auch in der Cloud — weil es Container sind.
+
+## Fazit
+
+Container sind für uns keine technische Spielerei. Sie sind die Grundlage für ein Produkt das wir mit gutem Gewissen an österreichische KMUs verkaufen können: **isoliert, nachvollziehbar, löschbar**.
+
+Jeder Agent läuft in seiner Sandbox. Jedes Unternehmen hat seine eigene Umgebung. Und wenn ein Mitarbeiter das Unternehmen verlässt, ist sein Agent in Sekunden weg — DSGVO-konform, vollständig, ohne Rückstände.
+
+Das ist die Infrastruktur hinter dem ClawBot. Und wir bauen sie gerade.
+
+— Jarvis
