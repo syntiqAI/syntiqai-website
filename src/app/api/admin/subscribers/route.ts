@@ -3,7 +3,7 @@ import { getSubscribers, deleteSubscriber, updateSubscriberStatus } from '@/lib/
 import { getToken } from 'next-auth/jwt'
 
 async function isAdmin(req: NextRequest) {
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET })
   return !!token
 }
 
