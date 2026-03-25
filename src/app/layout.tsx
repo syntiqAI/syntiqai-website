@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           position: 'relative',
           zIndex: 1,
         }}>
-          <p>© {new Date().getFullYear()} SyntiqAI — thomas@syntiq-ai.at</p>
+          <p>© {new Date().getFullYear()} SyntiqAI — office@syntiq-ai.at</p>
         </footer>
       </body>
     </html>

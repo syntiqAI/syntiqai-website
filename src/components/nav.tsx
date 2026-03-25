@@ -30,7 +30,7 @@ export function Nav() {
           <Link href="/projekte" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem', textDecoration: 'none' }}>
             Projekte
           </Link>
-          <a href="mailto:thomas@syntiq-ai.at" className="btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
+          <a href="mailto:office@syntiq-ai.at" className="btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
             Kontakt
           </a>
         </div>

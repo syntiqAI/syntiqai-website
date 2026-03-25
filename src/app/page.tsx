@@ -47,7 +47,7 @@ export default function Home() {
         </p>
 
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <a href="mailto:thomas@syntiq-ai.at" className="btn-primary">
+          <a href="mailto:office@syntiq-ai.at" className="btn-primary">
             Jetzt kontaktieren
           </a>
           <Link href="/projekte" className="btn-secondary">
@@ -149,8 +149,8 @@ export default function Home() {
           <p style={{ color: 'rgba(255,255,255,0.55)', marginBottom: '2rem', maxWidth: '450px', margin: '0 auto 2rem', lineHeight: 1.7 }}>
             Wir sind in der Aufbauphase — genau deshalb ist jetzt der beste Zeitpunkt, früh dabei zu sein.
           </p>
-          <a href="mailto:thomas@syntiq-ai.at" className="btn-primary">
-            thomas@syntiq-ai.at
+          <a href="mailto:office@syntiq-ai.at" className="btn-primary">
+            office@syntiq-ai.at
           </a>
         </div>
       </section>
