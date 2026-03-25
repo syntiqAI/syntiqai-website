@@ -60,11 +60,17 @@ export default function AdminBlogPage() {
   useEffect(() => { load() }, [])
 
   async function toggle(slug: string, current: boolean) {
-    await fetch('/api/admin/blog', {
+    const res = await fetch('/api/admin/blog', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slug, published: !current }),
     })
+    if (!res.ok) {
+      alert(`Fehler: ${res.status} — bitte Seite neu laden und nochmal versuchen.`)
+      return
+    }
+    // Optimistic update immediately, then reload
+    setPosts(prev => prev.map(p => p.slug === slug ? { ...p, published: !current } : p))
     load()
   }
 

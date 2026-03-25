@@ -2,7 +2,7 @@ import { getAllPosts } from '@/lib/mdx'
 import { getAllBlogPublishOverrides } from '@/lib/redis'
 import { BlogAccordion } from '@/components/blog-accordion'
 
-export const revalidate = 60 // revalidate every minute to pick up publish changes
+export const dynamic = 'force-dynamic' // always fetch fresh from Redis
 
 export default async function BlogIndex() {
   const allPosts = getAllPosts('blog', true)
