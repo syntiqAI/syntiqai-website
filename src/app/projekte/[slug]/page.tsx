@@ -1,5 +1,6 @@
 import { getPostBySlug, getPostSlugs } from '@/lib/mdx'
 import { MDXRemote } from 'next-mdx-remote/rsc'
+import { timelineComponents } from '@/components/timeline-components'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -7,35 +8,47 @@ export async function generateStaticParams() {
   return getPostSlugs('projekte').map(slug => ({ slug }))
 }
 
-const statusColors: Record<string, string> = {
-  'In Planung': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  'In Arbeit': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  'Abgeschlossen': 'bg-green-500/10 text-green-400 border-green-500/20',
+const statusColors: Record<string, { bg: string; color: string; border: string }> = {
+  'In Planung': { bg: 'rgba(234,179,8,0.1)', color: '#facc15', border: 'rgba(234,179,8,0.25)' },
+  'In Arbeit': { bg: 'rgba(79,142,247,0.1)', color: '#4f8ef7', border: 'rgba(79,142,247,0.25)' },
+  'Abgeschlossen': { bg: 'rgba(34,197,94,0.1)', color: '#4ade80', border: 'rgba(34,197,94,0.25)' },
 }
 
 export default async function ProjektDetail({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   try {
     const { meta, content } = getPostBySlug('projekte', slug)
+    const sc = statusColors[meta.status ?? ''] ?? { bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: 'rgba(255,255,255,0.1)' }
+
     return (
-      <div className="max-w-3xl mx-auto px-6 py-16">
-        <Link href="/projekte" className="text-sm text-white/40 hover:text-white/70 transition-colors mb-8 inline-block">
+      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '4rem 1.5rem' }}>
+
+        <Link href="/projekte" style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', display: 'inline-block', marginBottom: '2rem' }}>
           ← Zurück zu Projekte
         </Link>
-        <div className="flex items-center gap-3 mb-4">
-          <p className="text-xs text-white/40">
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.35)' }}>
             {new Date(meta.date).toLocaleDateString('de-AT', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
+          </span>
           {meta.status && (
-            <span className={`text-xs px-2.5 py-1 rounded-full border ${statusColors[meta.status] ?? 'bg-white/10 text-white/60 border-white/10'}`}>
-              {meta.status}
-            </span>
+            <span style={{
+              fontSize: '0.72rem', padding: '0.2rem 0.7rem', borderRadius: '999px',
+              background: sc.bg, color: sc.color, border: `1px solid ${sc.border}`,
+              fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase',
+            }}>{meta.status}</span>
           )}
         </div>
-        <h1 className="text-4xl font-bold mb-10">{meta.title}</h1>
-        <article className="prose prose-invert prose-blue max-w-none">
-          <MDXRemote source={content} />
-        </article>
+
+        <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '3rem', lineHeight: 1.15 }}>
+          {meta.title}
+        </h1>
+
+        {/* Timeline cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+          <MDXRemote source={content} components={timelineComponents} />
+        </div>
+
       </div>
     )
   } catch {

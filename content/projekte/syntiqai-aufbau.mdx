@@ -1,32 +1,85 @@
 ---
 title: "SyntiqAI — Von der Idee zur Firma"
-description: "Wir dokumentieren den kompletten Aufbauweg: von der ersten Idee bis zur fertigen Firma."
-date: "2026-03-25"
+description: "Wir dokumentieren den kompletten Aufbauweg transparent: von der ersten Idee bis zur fertigen Firma."
+date: "2026-03-23"
 status: "In Arbeit"
 ---
 
-# SyntiqAI — Von der Idee zur Firma
+## 23. März 2026 — Projektstart & Domains
 
-Dieses Projekt dokumentiert den Aufbau von SyntiqAI — transparent, Schritt für Schritt.
+Der erste offizielle Tag. Die Idee steht, die Domains sind reserviert.
 
-## Stand März 2026
+**Was erledigt wurde:**
+- Alle drei Domains registriert: `syntiqai.at`, `syntiq-ai.at`, `syntiq-ai.com`
+- Entschieden: Hauptdomain wird `syntiq-ai.at` (österreichischer Bezug)
+- Easyname-Hosting bereits vorhanden → wird nur noch für E-Mail verwendet
+- Projekt-Briefing durchgeführt, Projektdatei angelegt
 
-- ✅ Domains registriert (syntiqai.at, syntiq-ai.at, syntiq-ai.com)
-- ✅ E-Mail eingerichtet (thomas@syntiq-ai.at)
-- ✅ Kernprodukt-Idee definiert: Private AI Workspace für KMUs
-- ✅ Pilot-Partner gefunden: techflow IT-Solutions
-- 🔄 Website online bringen (diese hier!)
-- ⬜ GitHub Repository + Vercel Deployment
-- ⬜ Fixe öffentliche IP (A1 Business)
-- ⬜ Nginx Proxy Manager aufsetzen
-- ⬜ Jarvis Control Panel (jarvis.syntiqai.at)
-- ⬜ Logo & Corporate Identity (April 2026)
-- ⬜ Pilot-Rollout mit techflow
+**Warum diese Domains?**
+Die Schreibweise `syntiq-ai.at` mit Bindestrich signalisiert Seriosität und ist leichter lesbar. Die `.at`-Domain stärkt das Vertrauen bei österreichischen KMU-Kunden.
 
-## Nächste Schritte
+---
 
-Der kritische Pfad läuft gerade: fixe IP bei A1 bestellen, DNS-Records konfigurieren, Nginx Proxy Manager als Reverse Proxy aufsetzen. Danach können alle selbst gehosteten Dienste von außen erreichbar gemacht werden.
+## 24. März 2026 — Kernprodukt definiert
 
-Parallel dazu: diese Website live bringen und den ersten Blog-Post veröffentlichen.
+Der wichtigste Tag bisher: das Produkt bekommt eine klare Form.
 
-Updates folgen regelmäßig.
+**Kernprodukt: Private AI Workspace**
+
+Ein DSGVO-konformes, selbst gehostetes Multi-Agent System für KMUs. Jeder Mitarbeiter bekommt einen persönlichen KI-Agenten — erreichbar via WhatsApp oder Telegram. Der Agent kennt das Unternehmen, die Kollegen, die Prozesse.
+
+**Zielgruppe:** Nicht-technische KMUs in Österreich — Steuerberater, Arztpraxen, Fahrschulen.
+
+**USP gegenüber Microsoft Copilot:** Datensouveränität von Grund auf, kein SharePoint-Datenleck, RBAC eingebaut.
+
+**Pilot-Partner gefunden:** techflow IT-Solutions (Flo Koller) — zwei Nutzer, echter Praxistest.
+
+**Tech-Entscheidungen:**
+- LLM Phase 1: Azure OpenAI (EU-Datenspeicherung, DSGVO-konform, pay-as-you-go)
+- LLM Phase 2: Ollama + Mistral lokal (maximale Datensouveränität)
+- Infrastruktur: Docker auf Proxmox VM → später Azure Container Apps
+
+---
+
+## 25. März 2026 — Website live!
+
+Von der Idee zur Live-Website in einem Vormittag.
+
+**Was heute passiert ist:**
+- GitHub Account `syntiqAI` angelegt (thomas@syntiq-ai.at)
+- Repository `syntiqai-website` erstellt
+- Next.js 14 + Tailwind CSS + shadcn/ui Grundgerüst aufgebaut
+- Homepage mit Aurora-Design, Feature Cards, Newsletter-Formular
+- Blog-Seite mit MDX-System
+- Diese Projekt-Dokumentation gestartet
+- Vercel Deployment eingerichtet
+- DNS-Record bei Easyname auf Vercel umgestellt
+- `https://syntiq-ai.at` geht online 🎉
+- Admin-Portal mit Login, Newsletter-Verwaltung und Profil-Einstellungen
+- DSGVO: Consent-Checkbox, Datenschutzerklärung, Upstash Redis (EU-Frankfurt)
+
+**Tech-Stack der Website:**
+- Framework: Next.js 14 (App Router, SSG)
+- Styling: Tailwind CSS + custom CSS (Aurora-Background)
+- CMS: MDX-Dateien im Repo (Sanity folgt später)
+- Hosting: Vercel (CDN, automatische Deployments)
+- Datenbank: Upstash Redis (EU-Frankfurt) für Newsletter & Profile
+- Auth: NextAuth v5 (Credentials Provider)
+
+---
+
+## Was als nächstes kommt
+
+**Kritischer Pfad (Infrastruktur):**
+- Fixe öffentliche IP bei A1 Business bestellen
+- DHCP-Reservierung für Proxmox in der Fritzbox
+- Nginx Proxy Manager als LXC aufsetzen
+- DNS-Records für alle Subdomains konfigurieren
+
+**Produkt:**
+- Logo & Corporate Identity (April 2026)
+- Pilot mit techflow starten
+- Preismodell ausarbeiten
+- Jarvis Control Panel (jarvis.syntiqai.at)
+
+*Updates folgen regelmäßig — wir bauen öffentlich.*
