@@ -24,9 +24,5 @@ export async function POST(req: NextRequest) {
   const newHash = await bcrypt.hash(newPassword, 12)
   await redis.set('admin:password_hash', newHash)
 
-  return NextResponse.json({
-    success: true,
-    note: 'Passwort gespeichert. Aktualisiere auch ADMIN_PASSWORD_HASH in Vercel env vars.',
-    newHash,
-  })
+  return NextResponse.json({ success: true })
 }
