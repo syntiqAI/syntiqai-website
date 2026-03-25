@@ -22,7 +22,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
     const authorId = meta.author ? (authorMap[meta.author] ?? meta.author.toLowerCase()) : null
 
     return (
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '4rem 1.5rem' }}>
+      <div style={{ maxWidth: '980px', margin: '0 auto', padding: '4rem 1.5rem' }}>
         <Link href="/blog" style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', display: 'inline-block', marginBottom: '2rem' }}>
           ← Zurück zum Blog
         </Link>

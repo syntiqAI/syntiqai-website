@@ -21,7 +21,7 @@ export default async function ProjektDetail({ params }: { params: Promise<{ slug
     const sc = statusColors[meta.status ?? ''] ?? { bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: 'rgba(255,255,255,0.1)' }
 
     return (
-      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '4rem 1.5rem' }}>
+      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '4rem 1.5rem' }}>
 
         <Link href="/projekte" style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.4)', textDecoration: 'none', display: 'inline-block', marginBottom: '2rem' }}>
           ← Zurück zu Projekte

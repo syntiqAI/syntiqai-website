@@ -5,11 +5,11 @@ export const timelineComponents = {
       border: '1px solid rgba(255,255,255,0.08)',
       borderLeft: '3px solid #4f8ef7',
       borderRadius: '0 0.875rem 0 0',
-      padding: '1.25rem 1.75rem 0.75rem',
+      padding: '1.5rem 2rem 1rem',
       marginTop: '0',
     }}>
       <h2 style={{
-        fontSize: '1.1rem', fontWeight: 800, color: '#4f8ef7',
+        fontSize: '1.25rem', fontWeight: 800, color: '#4f8ef7',
         letterSpacing: '-0.01em', margin: 0,
       }}>{children}</h2>
     </div>
@@ -17,8 +17,8 @@ export const timelineComponents = {
 
   p: ({ children }: { children?: React.ReactNode }) => (
     <p style={{
-      color: 'rgba(255,255,255,0.7)', lineHeight: 1.75, fontSize: '0.925rem',
-      margin: '0 0 0.6rem 0',
+      color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, fontSize: '1rem',
+      margin: '0 0 0.75rem 0',
     }}>{children}</p>
   ),
 
@@ -33,7 +33,7 @@ export const timelineComponents = {
   ),
 
   li: ({ children }: { children?: React.ReactNode }) => (
-    <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+    <li style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', color: 'rgba(255,255,255,0.75)', fontSize: '1rem', lineHeight: 1.7 }}>
       <span style={{ color: '#4f8ef7', fontWeight: 700, flexShrink: 0, marginTop: '1px' }}>→</span>
       <span>{children}</span>
     </li>
