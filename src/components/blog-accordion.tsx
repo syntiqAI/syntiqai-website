@@ -12,31 +12,30 @@ export function BlogAccordion({ posts }: { posts: PostMeta[] }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
       {posts.map(post => {
         const isOpen = openSlug === post.slug
         return (
-          <div
-            key={post.slug}
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: `1px solid ${isOpen ? 'rgba(79,142,247,0.35)' : 'rgba(255,255,255,0.08)'}`,
-              borderRadius: '0.875rem',
-              overflow: 'hidden',
-              transition: 'border-color 0.2s',
-            }}
-          >
-            {/* Header — clickable */}
+          <div key={post.slug} style={{ marginBottom: '1.25rem' }}>
+
+            {/* Card header — like timeline h2 */}
             <button
               onClick={() => setOpenSlug(isOpen ? null : post.slug)}
               style={{
-                width: '100%', textAlign: 'left', background: 'transparent',
-                border: 'none', cursor: 'pointer', padding: '1.5rem 1.75rem',
+                width: '100%', textAlign: 'left', cursor: 'pointer', border: 'none',
+                background: 'rgba(255,255,255,0.03)',
+                borderTop: '1px solid rgba(255,255,255,0.08)',
+                borderRight: '1px solid rgba(255,255,255,0.08)',
+                borderBottom: isOpen ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                borderLeft: `3px solid ${isOpen ? '#6ba3ff' : '#4f8ef7'}`,
+                borderRadius: isOpen ? '0 0.875rem 0 0' : '0 0.875rem 0.875rem 0',
+                padding: '1.5rem 2rem',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem',
+                transition: 'all 0.2s',
               }}
             >
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.4rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)' }}>
                     {new Date(post.date).toLocaleDateString('de-AT', { year: 'numeric', month: 'long', day: 'numeric' })}
                   </span>
@@ -44,46 +43,59 @@ export function BlogAccordion({ posts }: { posts: PostMeta[] }) {
                     <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.3)' }}>· {post.author}</span>
                   )}
                 </div>
-                <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'white', margin: 0, letterSpacing: '-0.01em' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: isOpen ? '#4f8ef7' : 'white', margin: 0, letterSpacing: '-0.01em', transition: 'color 0.2s' }}>
                   {post.title}
                 </h2>
               </div>
               <div style={{
-                width: '28px', height: '28px', borderRadius: '50%',
-                background: 'rgba(79,142,247,0.12)', border: '1px solid rgba(79,142,247,0.2)',
+                width: '30px', height: '30px', borderRadius: '50%',
+                background: 'rgba(79,142,247,0.1)', border: '1px solid rgba(79,142,247,0.2)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0, transition: 'transform 0.2s',
-                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                color: '#4f8ef7', fontSize: '0.9rem',
-              }}>
-                ↓
-              </div>
+                flexShrink: 0, color: '#4f8ef7', fontSize: '1rem', fontWeight: 700,
+                transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.25s',
+              }}>↓</div>
             </button>
 
-            {/* Expanded content */}
+            {/* Expanded body */}
             {isOpen && (
               <div style={{
-                padding: '0 1.75rem 1.75rem',
-                borderTop: '1px solid rgba(255,255,255,0.06)',
-                paddingTop: '1.25rem',
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderTop: 'none',
+                borderLeft: '3px solid #4f8ef7',
+                borderRadius: '0 0 0.875rem 0',
+                overflow: 'hidden',
               }}>
-                <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.975rem', lineHeight: 1.75, marginBottom: '1.25rem' }}>
-                  {post.description}
-                </p>
-                {post.excerpt && (
-                  <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-                    {post.excerpt}
-                  </p>
+                {/* Image */}
+                {post.image && (
+                  <div style={{ width: '100%', height: '260px', overflow: 'hidden' }}>
+                    <img
+                      src={post.image}
+                      alt={post.imageAlt ?? post.title}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  </div>
                 )}
-                <Link
-                  href={`/blog/${post.slug}`}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
-                    color: '#4f8ef7', fontSize: '0.9rem', fontWeight: 600, textDecoration: 'none',
-                  }}
-                >
-                  Vollständig lesen →
-                </Link>
+
+                <div style={{ padding: '1.75rem 2rem' }}>
+                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', lineHeight: 1.8, marginBottom: '0.75rem' }}>
+                    {post.description}
+                  </p>
+                  {post.excerpt && (
+                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.9rem', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+                      {post.excerpt}
+                    </p>
+                  )}
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
+                      color: '#4f8ef7', fontSize: '0.95rem', fontWeight: 700, textDecoration: 'none',
+                    }}
+                  >
+                    Vollständig lesen →
+                  </Link>
+                </div>
               </div>
             )}
           </div>

@@ -13,6 +13,8 @@ export interface PostMeta {
   status?: string
   published?: boolean
   excerpt?: string
+  image?: string
+  imageAlt?: string
 }
 
 export function getPostSlugs(folder: string): string[] {

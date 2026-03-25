@@ -30,9 +30,14 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           {new Date(meta.date).toLocaleDateString('de-AT', { year: 'numeric', month: 'long', day: 'numeric' })}
           {meta.author && ` · ${meta.author}`}
         </p>
-        <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '2.5rem', lineHeight: 1.15 }}>
+        <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: meta.image ? '2rem' : '2.5rem', lineHeight: 1.15 }}>
           {meta.title}
         </h1>
+        {meta.image && (
+          <div style={{ borderRadius: '0.875rem', overflow: 'hidden', marginBottom: '2.5rem', height: '380px' }}>
+            <img src={meta.image} alt={meta.imageAlt ?? meta.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+        )}
         <article className="prose">
           <MDXRemote source={content} />
         </article>

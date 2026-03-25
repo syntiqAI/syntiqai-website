@@ -40,9 +40,14 @@ export default async function ProjektDetail({ params }: { params: Promise<{ slug
           )}
         </div>
 
-        <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: '3rem', lineHeight: 1.15 }}>
+        <h1 style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: meta.image ? '2rem' : '3rem', lineHeight: 1.15 }}>
           {meta.title}
         </h1>
+        {meta.image && (
+          <div style={{ borderRadius: '0.875rem', overflow: 'hidden', marginBottom: '3rem', height: '380px' }}>
+            <img src={meta.image} alt={meta.imageAlt ?? meta.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+        )}
 
         {/* Timeline cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
