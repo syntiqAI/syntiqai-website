@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { NavAuth } from './nav-auth'
 
 export function Nav() {
   return (
@@ -33,6 +34,7 @@ export function Nav() {
           <a href="mailto:office@syntiq-ai.at" className="btn-primary" style={{ padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}>
             Kontakt
           </a>
+          <NavAuth />
         </div>
       </div>
     </nav>

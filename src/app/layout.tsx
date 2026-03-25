@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Nav } from '@/components/nav'
+import { AuthSessionProvider } from '@/components/session-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -15,8 +16,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="aurora-orb aurora-orb-1" />
         <div className="aurora-orb aurora-orb-2" />
 
-        <Nav />
-        <main>{children}</main>
+        <AuthSessionProvider>
+          <Nav />
+          <main>{children}</main>
+        </AuthSessionProvider>
 
         <footer style={{
           borderTop: '1px solid rgba(255,255,255,0.07)',
