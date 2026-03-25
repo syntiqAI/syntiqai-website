@@ -95,28 +95,23 @@ export async function deleteTask(id: string): Promise<void> {
 
 // ─── Blog Publication ────────────────────────────────────────────────────────
 
+// All publish overrides stored in one hash: blog:publish_overrides → { slug: boolean }
 export async function getBlogPublishStatus(slug: string): Promise<boolean | null> {
-  const val = await redis.get<string>(`blog:published:${slug}`)
-  if (val === null) return null
-  return val === 'true'
+  const all = await redis.hget<boolean>('blog:publish_overrides', slug)
+  return all ?? null
 }
 
 export async function setBlogPublishStatus(slug: string, published: boolean): Promise<void> {
-  await redis.set(`blog:published:${slug}`, published ? 'true' : 'false')
+  await redis.hset('blog:publish_overrides', { [slug]: published })
 }
 
 export async function getAllBlogPublishOverrides(): Promise<Record<string, boolean>> {
-  // We store keys as blog:published:slug — scan for them
-  const result: Record<string, boolean> = {}
   try {
-    const keys = await redis.keys('blog:published:*')
-    for (const key of keys) {
-      const slug = key.replace('blog:published:', '')
-      const val = await redis.get<string>(key)
-      result[slug] = val === 'true'
-    }
-  } catch { /* ignore */ }
-  return result
+    const all = await redis.hgetall<Record<string, boolean>>('blog:publish_overrides')
+    return all ?? {}
+  } catch {
+    return {}
+  }
 }
 
 interface ContentOverride {
