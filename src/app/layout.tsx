@@ -1,9 +1,6 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
 import { Nav } from '@/components/nav'
 import './globals.css'
-
-const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' })
 
 export const metadata: Metadata = {
   title: 'SyntiqAI — KI-Lösungen für Ihr Unternehmen',
@@ -12,11 +9,25 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={geist.variable}>
-      <body className="min-h-screen">
+    <html lang="de">
+      <body>
+        {/* Aurora background orbs */}
+        <div className="aurora-orb aurora-orb-1" />
+        <div className="aurora-orb aurora-orb-2" />
+
         <Nav />
         <main>{children}</main>
-        <footer className="border-t border-white/10 mt-24 py-8 text-center text-sm text-white/40">
+
+        <footer style={{
+          borderTop: '1px solid rgba(255,255,255,0.07)',
+          marginTop: '6rem',
+          padding: '2rem 0',
+          textAlign: 'center',
+          fontSize: '0.875rem',
+          color: 'rgba(255,255,255,0.3)',
+          position: 'relative',
+          zIndex: 1,
+        }}>
           <p>© {new Date().getFullYear()} SyntiqAI — thomas@syntiq-ai.at</p>
         </footer>
       </body>
