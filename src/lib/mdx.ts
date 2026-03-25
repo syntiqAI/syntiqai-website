@@ -15,6 +15,7 @@ export interface PostMeta {
   excerpt?: string
   image?: string
   imageAlt?: string
+  version?: number
 }
 
 export function getPostSlugs(folder: string): string[] {

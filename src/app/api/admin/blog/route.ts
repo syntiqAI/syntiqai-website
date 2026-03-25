@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth-server'
 import { getAllPosts, getPostBySlug } from '@/lib/mdx'
-import { setBlogPublishStatus, getAllBlogPublishOverrides, setBlogContentOverride, getBlogContentOverride } from '@/lib/redis'
+import {
+  setBlogPublishStatus,
+  getAllBlogPublishOverrides,
+  setBlogContentOverride,
+  getBlogContentOverrideRaw,
+} from '@/lib/redis'
 
 export async function GET(req: NextRequest) {
   const session = await auth()
@@ -9,14 +14,22 @@ export async function GET(req: NextRequest) {
 
   const slug = req.nextUrl.searchParams.get('slug')
 
-  // Single post fetch (for editor)
   if (slug) {
-    const { meta, content } = getPostBySlug('blog', slug)
-    const override = await getBlogContentOverride(slug)
-    return NextResponse.json({ meta, content: override ?? content })
+    const { meta, content: fileContent } = getPostBySlug('blog', slug)
+    const override = await getBlogContentOverrideRaw(slug)
+    const fileVersion = meta.version ?? 0
+    const hasNewerFile = override ? fileVersion > (override.savedVersion ?? 0) : false
+
+    return NextResponse.json({
+      meta,
+      content: fileContent,          // always show file content in editor
+      adminContent: override?.content ?? null, // what admin saved (if any)
+      savedVersion: override?.savedVersion ?? null,
+      fileVersion,
+      hasNewerFile,                  // true = file updated since last admin edit
+    })
   }
 
-  // All posts list
   const posts = getAllPosts('blog', true)
   const overrides = await getAllBlogPublishOverrides()
   const result = posts.map(p => ({
@@ -33,11 +46,10 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json()
 
   if (body.content !== undefined) {
-    await setBlogContentOverride(body.slug, body.content)
+    await setBlogContentOverride(body.slug, body.content, body.fileVersion ?? 0)
     return NextResponse.json({ success: true })
   }
 
-  // Toggle publish
   await setBlogPublishStatus(body.slug, body.published)
   return NextResponse.json({ success: true })
 }

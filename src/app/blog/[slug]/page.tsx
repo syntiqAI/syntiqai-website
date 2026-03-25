@@ -22,7 +22,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const session = await auth()
   try {
     const { meta, content: fileContent } = getPostBySlug('blog', slug)
-    const contentOverride = await getBlogContentOverride(slug)
+    const contentOverride = await getBlogContentOverride(slug, meta.version ?? 0)
     const content = contentOverride ?? fileContent
     const authorId = meta.author ? (authorMap[meta.author] ?? meta.author.toLowerCase()) : null
 

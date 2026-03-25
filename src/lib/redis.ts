@@ -82,12 +82,25 @@ export async function getAllBlogPublishOverrides(): Promise<Record<string, boole
   return result
 }
 
-export async function getBlogContentOverride(slug: string): Promise<string | null> {
-  return redis.get<string>(`blog:content:${slug}`)
+interface ContentOverride {
+  content: string
+  savedVersion: number // frontmatter version when admin saved this
 }
 
-export async function setBlogContentOverride(slug: string, content: string): Promise<void> {
-  await redis.set(`blog:content:${slug}`, content)
+export async function getBlogContentOverride(slug: string, fileVersion = 0): Promise<string | null> {
+  const override = await redis.get<ContentOverride>(`blog:content:${slug}`)
+  if (!override) return null
+  // File has been updated since admin last saved → file wins
+  if (fileVersion > (override.savedVersion ?? 0)) return null
+  return override.content
+}
+
+export async function getBlogContentOverrideRaw(slug: string): Promise<ContentOverride | null> {
+  return redis.get<ContentOverride>(`blog:content:${slug}`)
+}
+
+export async function setBlogContentOverride(slug: string, content: string, savedVersion = 0): Promise<void> {
+  await redis.set(`blog:content:${slug}`, { content, savedVersion })
 }
 
 // ─── Admin Profile ───────────────────────────────────────────────────────────

@@ -39,6 +39,10 @@ export default function AdminBlogPage() {
   const [editSlug, setEditSlug] = useState<string | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editContent, setEditContent] = useState('')
+  const [fileContent, setFileContent] = useState('')
+  const [fileVersion, setFileVersion] = useState(0)
+  const [savedVersion, setSavedVersion] = useState<number | null>(null)
+  const [hasNewerFile, setHasNewerFile] = useState(false)
   const [editLoading, setEditLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedMsg, setSavedMsg] = useState('')
@@ -71,7 +75,12 @@ export default function AdminBlogPage() {
     setEditLoading(true)
     const res = await fetch(`/api/admin/blog?slug=${slug}`)
     const data = await res.json()
-    setEditContent(data.content ?? '')
+    setFileContent(data.content ?? '')
+    setFileVersion(data.fileVersion ?? 0)
+    setSavedVersion(data.savedVersion ?? null)
+    setHasNewerFile(data.hasNewerFile ?? false)
+    // Show admin's saved version if exists and not outdated, else show file
+    setEditContent(data.adminContent && !data.hasNewerFile ? data.adminContent : data.content)
     setEditLoading(false)
   }
 
@@ -81,8 +90,10 @@ export default function AdminBlogPage() {
     await fetch('/api/admin/blog', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug: editSlug, content: editContent }),
+      body: JSON.stringify({ slug: editSlug, content: editContent, fileVersion }),
     })
+    setSavedVersion(fileVersion)
+    setHasNewerFile(false)
     setSaving(false)
     setSavedMsg('✓ Gespeichert')
     setTimeout(() => setSavedMsg(''), 2500)
@@ -90,19 +101,17 @@ export default function AdminBlogPage() {
 
   async function resetToFile() {
     if (!editSlug) return
-    if (!confirm('Redis-Override löschen und auf Original-Datei zurücksetzen?')) return
     setSaving(true)
     await fetch('/api/admin/blog', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ slug: editSlug }),
     })
-    // Reload content from file
-    const res = await fetch(`/api/admin/blog?slug=${editSlug}`)
-    const data = await res.json()
-    setEditContent(data.content ?? '')
+    setEditContent(fileContent)
+    setHasNewerFile(false)
+    setSavedVersion(null)
     setSaving(false)
-    setSavedMsg('✓ Zurückgesetzt auf Datei')
+    setSavedMsg('✓ Neue Version geladen')
     setTimeout(() => setSavedMsg(''), 2500)
   }
 
@@ -212,11 +221,31 @@ export default function AdminBlogPage() {
               <button type="button" onClick={() => setEditSlug(null)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '1.25rem', cursor: 'pointer', flexShrink: 0 }}>✕</button>
             </div>
 
-            {editLoading ? <p style={{ color: 'rgba(255,255,255,0.4)' }}>Lade Inhalt...</p> : (
+            {editLoading ? <p style={{ color: 'rgba(255,255,255,0.4)' }}>Lade...</p> : (
               <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start' }}>
 
                 {/* Editor */}
                 <div style={{ flex: 1 }}>
+                  {/* Version banner */}
+                  {hasNewerFile && (
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap',
+                      padding: '0.75rem 1rem', marginBottom: '0.75rem',
+                      background: 'rgba(79,142,247,0.08)', border: '1px solid rgba(79,142,247,0.25)',
+                      borderRadius: '0.5rem', fontSize: '0.82rem',
+                    }}>
+                      <span style={{ color: '#4f8ef7' }}>🆕 Jarvis hat eine neue Version geschrieben (v{fileVersion}). Du siehst gerade diese neue Version.</span>
+                    </div>
+                  )}
+                  {!hasNewerFile && savedVersion !== null && (
+                    <div style={{
+                      padding: '0.5rem 1rem', marginBottom: '0.75rem',
+                      background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)',
+                      borderRadius: '0.5rem', fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)',
+                    }}>
+                      Du bearbeitest deine eigene Version (gespeichert bei Datei-v{savedVersion})
+                    </div>
+                  )}
                   <textarea
                     value={editContent}
                     onChange={e => setEditContent(e.target.value)}
