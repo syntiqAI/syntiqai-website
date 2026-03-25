@@ -190,7 +190,7 @@ export default function AdminBlogPage() {
                 <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: '0 0 0.2rem' }}>{editTitle}</h2>
                 <code style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)' }}>{editSlug}</code>
               </div>
-              <button onClick={() => setEditSlug(null)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '1.25rem', cursor: 'pointer', flexShrink: 0 }}>✕</button>
+              <button type="button" onClick={() => setEditSlug(null)} style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '1.25rem', cursor: 'pointer', flexShrink: 0 }}>✕</button>
             </div>
 
             {editLoading ? <p style={{ color: 'rgba(255,255,255,0.4)' }}>Lade Inhalt...</p> : (
@@ -207,13 +207,30 @@ export default function AdminBlogPage() {
                     }}
                   />
                   <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', alignItems: 'center' }}>
-                    <button onClick={saveEdit} disabled={saving} className="btn-primary" style={{ padding: '0.6rem 1.5rem' }}>
+                    <button
+                      type="button"
+                      onClick={saveEdit}
+                      disabled={saving}
+                      style={{
+                        padding: '0.6rem 1.5rem', borderRadius: '0.5rem', cursor: saving ? 'not-allowed' : 'pointer',
+                        background: 'linear-gradient(135deg, #4f8ef7, #7c6cf7)',
+                        border: 'none', color: 'white', fontWeight: 700, fontSize: '0.875rem',
+                        opacity: saving ? 0.7 : 1,
+                      }}
+                    >
                       {saving ? 'Speichern...' : 'Speichern'}
                     </button>
-                    <button onClick={() => setEditSlug(null)} style={{
-                      padding: '0.6rem 1.25rem', borderRadius: '0.5rem', cursor: 'pointer',
-                      background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.6)',
-                    }}>Schließen</button>
+                    <button
+                      type="button"
+                      onClick={() => setEditSlug(null)}
+                      style={{
+                        padding: '0.6rem 1.25rem', borderRadius: '0.5rem', cursor: 'pointer',
+                        background: 'transparent', border: '1px solid rgba(255,255,255,0.2)',
+                        color: 'rgba(255,255,255,0.6)', fontSize: '0.875rem',
+                      }}
+                    >
+                      Schließen
+                    </button>
                     {savedMsg && <span style={{ color: '#4ade80', fontSize: '0.875rem' }}>{savedMsg}</span>}
                   </div>
                 </div>
