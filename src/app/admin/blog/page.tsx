@@ -201,7 +201,8 @@ export default function AdminBlogPage() {
           <div style={{
             background: '#0d1117', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '1rem',
             width: '100%', maxWidth: '960px', padding: '2rem',
-          }}>
+            position: 'relative', zIndex: 201,
+          }} onClick={e => e.stopPropagation()}>
             {/* Modal header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', gap: '1rem' }}>
               <div>
