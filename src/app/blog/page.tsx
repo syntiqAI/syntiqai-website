@@ -1,30 +1,27 @@
-import Link from 'next/link'
 import { getAllPosts } from '@/lib/mdx'
+import { getAllBlogPublishOverrides } from '@/lib/redis'
+import { BlogAccordion } from '@/components/blog-accordion'
 
-export default function BlogIndex() {
-  const posts = getAllPosts('blog')
+export const revalidate = 60 // revalidate every minute to pick up publish changes
+
+export default async function BlogIndex() {
+  const allPosts = getAllPosts('blog', true)
+  const overrides = await getAllBlogPublishOverrides()
+
+  const posts = allPosts
+    .map(p => ({
+      ...p,
+      published: overrides[p.slug] !== undefined ? overrides[p.slug] : (p.published ?? true),
+    }))
+    .filter(p => p.published)
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-16">
-      <h1 className="text-4xl font-bold mb-2">Blog</h1>
-      <p className="text-white/60 mb-12">Gedanken, Updates und Einblicke rund um SyntiqAI.</p>
-
-      <div className="space-y-6">
-        {posts.map(post => (
-          <Link
-            key={post.slug}
-            href={`/blog/${post.slug}`}
-            className="block bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/8 hover:border-blue-500/30 transition-all"
-          >
-            <p className="text-xs text-white/40 mb-2">
-              {new Date(post.date).toLocaleDateString('de-AT', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
-            <h2 className="text-xl font-semibold mb-2">{post.title}</h2>
-            <p className="text-white/60 text-sm leading-relaxed">{post.description}</p>
-            <span className="mt-4 inline-block text-blue-400 text-sm">Weiterlesen →</span>
-          </Link>
-        ))}
-      </div>
+    <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '4rem 1.5rem' }}>
+      <h1 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-0.03em', marginBottom: '0.75rem' }}>Blog</h1>
+      <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '3rem', fontSize: '1rem' }}>
+        Gedanken, Updates und Einblicke rund um SyntiqAI.
+      </p>
+      <BlogAccordion posts={posts} />
     </div>
   )
 }

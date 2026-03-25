@@ -23,6 +23,19 @@ export default async function AdminPage() {
         </div>
       </div>
 
+      {/* Quick nav */}
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
+        {[
+          { href: '/admin/blog', label: '✍️ Blog-Verwaltung', desc: 'Entwürfe freigeben' },
+          { href: '/admin/settings', label: '⚙️ Einstellungen', desc: 'Profil & Passwort' },
+        ].map(item => (
+          <Link key={item.href} href={item.href} className="glass-card" style={{ padding: '1rem 1.5rem', textDecoration: 'none', flex: '1', minWidth: '180px' }}>
+            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'white', marginBottom: '0.2rem' }}>{item.label}</div>
+            <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>{item.desc}</div>
+          </Link>
+        ))}
+      </div>
+
       <section>
         <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>
           Newsletter Abonnenten

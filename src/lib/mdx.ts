@@ -11,6 +11,8 @@ export interface PostMeta {
   date: string
   author?: string
   status?: string
+  published?: boolean
+  excerpt?: string
 }
 
 export function getPostSlugs(folder: string): string[] {
@@ -23,14 +25,26 @@ export function getPostBySlug(folder: string, slug: string): { meta: PostMeta; c
   const filePath = path.join(contentDirectory, folder, `${slug}.mdx`)
   const raw = fs.readFileSync(filePath, 'utf8')
   const { data, content } = matter(raw)
+  // Extract plain-text excerpt (first ~250 chars, strip markdown)
+  const excerpt = content
+    .replace(/^#+\s+.*/gm, '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+    .replace(/---/g, '')
+    .replace(/\n+/g, ' ')
+    .trim()
+    .slice(0, 250)
+    .trim() + '...'
+
   return {
-    meta: { slug, ...data } as PostMeta,
+    meta: { slug, published: true, ...data, excerpt } as PostMeta,
     content,
   }
 }
 
-export function getAllPosts(folder: string): PostMeta[] {
+export function getAllPosts(folder: string, includeUnpublished = false): PostMeta[] {
   return getPostSlugs(folder)
     .map(slug => getPostBySlug(folder, slug).meta)
+    .filter(p => includeUnpublished || p.published !== false)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
