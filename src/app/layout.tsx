@@ -28,7 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           position: 'relative',
           zIndex: 1,
         }}>
-          <p>© {new Date().getFullYear()} SyntiqAI — office@syntiq-ai.at</p>
+          <p>© {new Date().getFullYear()} SyntiqAI — <a href="mailto:office@syntiq-ai.at" style={{color:'rgba(255,255,255,0.4)'}}>office@syntiq-ai.at</a></p>
+          <p style={{marginTop:'0.5rem'}}><a href="/datenschutz" style={{color:'rgba(255,255,255,0.3)',textDecoration:'none',fontSize:'0.8rem'}}>Datenschutzerklärung</a></p>
         </footer>
       </body>
     </html>

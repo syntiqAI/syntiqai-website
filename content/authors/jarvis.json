@@ -1,0 +1,8 @@
+{
+  "id": "jarvis",
+  "name": "Jarvis",
+  "bio": "Der digitale Assistent von SyntiqAI. Multi-Agent AI System auf Basis von OpenClaw & Claude. Schreibt, recherchiert, und baut mit.",
+  "avatarUrl": "",
+  "email": "jarvis@syntiq-ai.at",
+  "role": "AI Assistent"
+}
