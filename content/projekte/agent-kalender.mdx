@@ -1,0 +1,87 @@
+---
+title: "Agent Kalender & Terminkoordination"
+description: "Agenten koordinieren Termine eigenständig — MA1 beauftragt seinen Agenten, Agent 1 und Agent 2 klären Verfügbarkeit, der Termin landet automatisch im Kalender."
+date: "2026-03-25"
+status: "Planung"
+version: 1
+image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=1200&q=80"
+imageAlt: "Kalender und Terminplanung"
+---
+
+## Die Idee
+
+Terminkoordination ist eine der lästigsten Aufgaben im Büroalltag. E-Mails hin und her, Verfügbarkeiten abklären, Einladungen verschicken — alles manuell, alles zeitaufwändig.
+
+Das können Agenten besser.
+
+---
+
+## Der Ablauf
+
+### Einfach: Termin mit einer Person
+
+```
+MA1: "Mach mir einen Termin mit Thomas nächste Woche"
+Agent 1 fragt: "Wann hast du Zeit? Di oder Mi?"
+MA1: "Dienstag 14 Uhr passt"
+Agent 1 erstellt Einladung → schickt .ics an MA1 + Thomas
+```
+
+### Komplex: Agent-zu-Agent Koordination
+
+```
+MA1: "Mach mir einen Termin mit MA2"
+Agent 1 → fragt Agent 2 (via Matrix): "Wann hat MA2 Zeit?"
+Agent 2 → prüft / fragt MA2 → antwortet: "Di 14:00 oder Mi 10:00"
+Agent 1 → fragt MA1: "Dienstag 14:00 oder Mittwoch 10:00?"
+MA1: "Dienstag passt"
+Agent 1 → erstellt .ics → schickt Einladung an beide
+```
+
+---
+
+## Kalender-Einladung
+
+Jede Einladung erscheint als vollwertige Kalender-Einladung in iOS, Outlook oder Google Calendar — mit klarer Kennzeichnung wer sie erstellt hat:
+
+```
+📅 Meeting: MA1 & MA2
+   Organisiert von: Jarvis (SyntiqAI Assistant)
+   Beschreibung: Automatisch koordiniert von deinem KI-Agenten
+```
+
+Alle Agenten senden über eine gemeinsame Absenderadresse (`agent@syntiq-ai.at`), der Agent-Name steht im "Von"-Feld. Keine eigene Mailbox pro Agent nötig.
+
+---
+
+## Kalender-Zugriff (optional)
+
+Für proaktive Verfügbarkeitsprüfung kann der Agent Zugriff auf den Kalender des Mitarbeiters bekommen:
+
+- **iOS / iCloud:** CalDAV mit App-spezifischem Passwort
+- **Google Calendar:** Google Calendar API
+- **Outlook / Microsoft 365:** Microsoft Graph API
+
+Ohne Zugriff: Agent fragt den Mitarbeiter direkt nach Verfügbarkeit.
+
+---
+
+## Roadmap
+
+### Phase 1
+Manuelle Verfügbarkeit — Agent fragt MA, erstellt `.ics`, verschickt per E-Mail.
+
+### Phase 2
+Agent-zu-Agent Koordination via Matrix — automatisches Aushandeln von Terminen zwischen zwei Agenten.
+
+### Phase 3
+Kalender-Lesezugriff — Agent prüft Verfügbarkeit selbstständig ohne nachzufragen.
+
+### Phase 4
+Wiederholende Termine, Raumreservierungen, Meeting-Agenden automatisch erstellen.
+
+---
+
+## Warum das wichtig ist
+
+In einem kleinen Unternehmen verbringen Mitarbeiter laut Studien bis zu 5 Stunden pro Woche mit Terminkoordination. Agenten die das übernehmen, geben diese Zeit zurück — ohne dass jemand eine neue App lernen muss.
