@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { NewsletterForm } from '@/components/newsletter-form'
 
 export default function Home() {
   return (
@@ -136,23 +137,32 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{ padding: '4rem 0 6rem', textAlign: 'center' }}>
+      {/* Newsletter */}
+      <section style={{ padding: '4rem 0' }}>
         <div className="glass-card" style={{
           padding: '4rem 2rem',
           background: 'rgba(79,142,247,0.06)',
           borderColor: 'rgba(79,142,247,0.2)',
+          textAlign: 'center',
         }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '1rem' }}>
-            Bereit für den nächsten Schritt?
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '0.75rem' }}>
+            Bleib auf dem Laufenden
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.55)', marginBottom: '2rem', maxWidth: '450px', margin: '0 auto 2rem', lineHeight: 1.7 }}>
-            Wir sind in der Aufbauphase — genau deshalb ist jetzt der beste Zeitpunkt, früh dabei zu sein.
+          <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '2rem', maxWidth: '450px', margin: '0 auto 2rem', lineHeight: 1.7 }}>
+            Updates zu SyntiqAI, neuen Features und AI-Trends direkt in dein Postfach.
           </p>
-          <a href="mailto:office@syntiq-ai.at" className="btn-primary">
-            office@syntiq-ai.at
-          </a>
+          <NewsletterForm />
         </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ padding: '2rem 0 6rem', textAlign: 'center' }}>
+        <p style={{ color: 'rgba(255,255,255,0.4)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+          Lieber direkt schreiben?
+        </p>
+        <a href="mailto:office@syntiq-ai.at" className="btn-secondary">
+          office@syntiq-ai.at
+        </a>
       </section>
 
     </div>
