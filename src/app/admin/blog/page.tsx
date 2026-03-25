@@ -88,6 +88,24 @@ export default function AdminBlogPage() {
     setTimeout(() => setSavedMsg(''), 2500)
   }
 
+  async function resetToFile() {
+    if (!editSlug) return
+    if (!confirm('Redis-Override löschen und auf Original-Datei zurücksetzen?')) return
+    setSaving(true)
+    await fetch('/api/admin/blog', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug: editSlug }),
+    })
+    // Reload content from file
+    const res = await fetch(`/api/admin/blog?slug=${editSlug}`)
+    const data = await res.json()
+    setEditContent(data.content ?? '')
+    setSaving(false)
+    setSavedMsg('✓ Zurückgesetzt auf Datei')
+    setTimeout(() => setSavedMsg(''), 2500)
+  }
+
   const sections = editContent ? parseSections(editContent) : []
 
   const inputStyle = {
@@ -206,7 +224,7 @@ export default function AdminBlogPage() {
                       resize: 'vertical', lineHeight: 1.6, fontFamily: 'monospace', fontSize: '0.85rem',
                     }}
                   />
-                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
                     <button
                       type="button"
                       onClick={saveEdit}
@@ -218,7 +236,7 @@ export default function AdminBlogPage() {
                         opacity: saving ? 0.7 : 1,
                       }}
                     >
-                      {saving ? 'Speichern...' : 'Speichern'}
+                      {saving ? '...' : 'Speichern'}
                     </button>
                     <button
                       type="button"
@@ -230,6 +248,18 @@ export default function AdminBlogPage() {
                       }}
                     >
                       Schließen
+                    </button>
+                    <button
+                      type="button"
+                      onClick={resetToFile}
+                      disabled={saving}
+                      style={{
+                        padding: '0.6rem 1.25rem', borderRadius: '0.5rem', cursor: 'pointer',
+                        background: 'transparent', border: '1px solid rgba(248,113,113,0.3)',
+                        color: '#f87171', fontSize: '0.8rem',
+                      }}
+                    >
+                      ↺ Auf Original zurücksetzen
                     </button>
                     {savedMsg && <span style={{ color: '#4ade80', fontSize: '0.875rem' }}>{savedMsg}</span>}
                   </div>

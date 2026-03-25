@@ -33,12 +33,21 @@ export async function PATCH(req: NextRequest) {
   const body = await req.json()
 
   if (body.content !== undefined) {
-    // Save content edit
     await setBlogContentOverride(body.slug, body.content)
     return NextResponse.json({ success: true })
   }
 
   // Toggle publish
   await setBlogPublishStatus(body.slug, body.published)
+  return NextResponse.json({ success: true })
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = await auth()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { slug } = await req.json()
+  const { redis } = await import('@/lib/redis')
+  await redis.del(`blog:content:${slug}`)
   return NextResponse.json({ success: true })
 }
