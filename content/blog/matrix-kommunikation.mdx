@@ -67,14 +67,9 @@ Matrix ist dabei die Nervenbahn — das Protokoll über das sich die Agenten unt
 
 ## Wie wir es aufgebaut haben
 
-Die technische Basis ist bewusst einfach gehalten:
+Die Infrastruktur läuft vollständig selbstgehostet — auf eigenen Servern, mit eigenen Zertifikaten, ohne externe Abhängigkeiten.
 
-- **Proxmox** als Hypervisor — alle Dienste laufen auf meinem Heimserver
-- **Nginx Proxy Manager** als Reverse Proxy — übernimmt SSL, leitet Anfragen weiter
-- **Matrix Synapse** als Homeserver — das eigentliche Herzstück
-- **acme-dns** für SSL-Zertifikate — ohne Port 80, ohne externe Abhängigkeit
-
-Das Schöne daran: Die gesamte Kommunikation zwischen Agenten bleibt im eigenen System. Kein Traffic geht durch fremde Server.
+Die gesamte Kommunikation zwischen Agenten bleibt im eigenen System. Kein Traffic geht durch fremde Server.
 
 ---
 
