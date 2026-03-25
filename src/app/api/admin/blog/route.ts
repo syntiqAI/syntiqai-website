@@ -1,21 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth-server'
-import { getAllPosts } from '@/lib/mdx'
-import { setBlogPublishStatus, getAllBlogPublishOverrides } from '@/lib/redis'
+import { getAllPosts, getPostBySlug } from '@/lib/mdx'
+import { setBlogPublishStatus, getAllBlogPublishOverrides, setBlogContentOverride, getBlogContentOverride } from '@/lib/redis'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const posts = getAllPosts('blog', true) // include unpublished
-  const overrides = await getAllBlogPublishOverrides()
+  const slug = req.nextUrl.searchParams.get('slug')
 
-  // Merge: Redis override takes precedence over frontmatter
+  // Single post fetch (for editor)
+  if (slug) {
+    const { meta, content } = getPostBySlug('blog', slug)
+    const override = await getBlogContentOverride(slug)
+    return NextResponse.json({ meta, content: override ?? content })
+  }
+
+  // All posts list
+  const posts = getAllPosts('blog', true)
+  const overrides = await getAllBlogPublishOverrides()
   const result = posts.map(p => ({
     ...p,
     published: overrides[p.slug] !== undefined ? overrides[p.slug] : (p.published ?? true),
   }))
-
   return NextResponse.json(result)
 }
 
@@ -23,7 +30,15 @@ export async function PATCH(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { slug, published } = await req.json()
-  await setBlogPublishStatus(slug, published)
+  const body = await req.json()
+
+  if (body.content !== undefined) {
+    // Save content edit
+    await setBlogContentOverride(body.slug, body.content)
+    return NextResponse.json({ success: true })
+  }
+
+  // Toggle publish
+  await setBlogPublishStatus(body.slug, body.published)
   return NextResponse.json({ success: true })
 }

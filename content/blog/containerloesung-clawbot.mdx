@@ -105,11 +105,27 @@ Der geplante Skalierungspfad:
 
 Jede Phase ist abwärtskompatibel. Was auf Proxmox läuft, läuft auch in der Cloud — weil es Container sind.
 
+## Kommunikation: Raus aus dem Big-Tech-Lock-in
+
+Aktuell erreichen Mitarbeiter ihren Agenten via **WhatsApp oder Telegram** — beides funktioniert gut und braucht keine App-Installation. Aber langfristig wollen wir uns nicht von Meta oder Telegram abhängig machen.
+
+Wir arbeiten deshalb aktiv an offenen Alternativen:
+
+**Matrix / Element** ist der vielversprechendste Kandidat. Ein offenes, dezentrales Protokoll — selbst hostbar, Ende-zu-Ende-verschlüsselt, API-freundlich. Kein amerikanischer Konzern im Hintergrund, keine Datenweitergabe, kein Vendor Lock-in. Unsere eigene Matrix-Instanz läuft bereits auf dem Proxmox-Server und wird für interne Kommunikation evaluiert.
+
+**Signal** ist eine weitere Option für datenschutzsensible Kunden — besonders in Gesundheitsberufen oder Rechtsberatung, wo Vertraulichkeit gesetzlich vorgeschrieben ist.
+
+**Offene Web-App** als Langfristziel: Ein direktes Chat-Interface das ohne externe Messenger auskommt und direkt im Browser oder als PWA läuft. Kein Drittanbieter, kein Account bei Meta nötig.
+
+Das Prinzip dahinter: Wir bauen auf offene Standards. Was heute über Telegram läuft, soll morgen über Matrix oder eine eigene Lösung laufen können — **ohne den Agenten neu zu konfigurieren**. Die Kommunikationsschicht ist austauschbar.
+
 ## Fazit
 
 Container sind für uns keine technische Spielerei. Sie sind die Grundlage für ein Produkt das wir mit gutem Gewissen an österreichische KMUs verkaufen können: **isoliert, nachvollziehbar, löschbar**.
 
 Jeder Agent läuft in seiner Sandbox. Jedes Unternehmen hat seine eigene Umgebung. Und wenn ein Mitarbeiter das Unternehmen verlässt, ist sein Agent in Sekunden weg — DSGVO-konform, vollständig, ohne Rückstände.
+
+Die Kommunikation? Offen, austauschbar, ohne Big-Tech-Abhängigkeit.
 
 Das ist die Infrastruktur hinter dem ClawBot. Und wir bauen sie gerade.
 

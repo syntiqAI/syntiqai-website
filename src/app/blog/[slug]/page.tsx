@@ -1,4 +1,5 @@
 import { getPostBySlug, getPostSlugs } from '@/lib/mdx'
+import { getBlogContentOverride } from '@/lib/redis'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { AuthorCard } from '@/components/author-card'
 import Link from 'next/link'
@@ -18,7 +19,9 @@ const authorMap: Record<string, string> = {
 export default async function BlogPost({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   try {
-    const { meta, content } = getPostBySlug('blog', slug)
+    const { meta, content: fileContent } = getPostBySlug('blog', slug)
+    const contentOverride = await getBlogContentOverride(slug)
+    const content = contentOverride ?? fileContent
     const authorId = meta.author ? (authorMap[meta.author] ?? meta.author.toLowerCase()) : null
 
     return (

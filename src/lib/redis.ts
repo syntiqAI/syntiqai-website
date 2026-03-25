@@ -82,6 +82,14 @@ export async function getAllBlogPublishOverrides(): Promise<Record<string, boole
   return result
 }
 
+export async function getBlogContentOverride(slug: string): Promise<string | null> {
+  return redis.get<string>(`blog:content:${slug}`)
+}
+
+export async function setBlogContentOverride(slug: string, content: string): Promise<void> {
+  await redis.set(`blog:content:${slug}`, content)
+}
+
 // ─── Admin Profile ───────────────────────────────────────────────────────────
 
 export interface AdminProfile {
