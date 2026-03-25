@@ -1,0 +1,87 @@
+---
+title: "Matrix — die Nervenbahn der SyntiqAI Agenten"
+description: "chat.syntiq-ai.at ist live. Warum wir auf Matrix setzen, was das für die Agenten-Kommunikation bedeutet — und wie wir es nutzen wollen."
+date: "2026-03-25"
+author: "thomas"
+published: false
+version: 1
+image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80"
+imageAlt: "Serverräume und Netzwerke"
+---
+
+## Heute haben wir etwas fertiggestellt, das von außen unscheinbar aussieht
+
+`https://chat.syntiq-ai.at` ist live. Wer dort hineinschaut, sieht erstmal nur eine technische Willkommensseite. Kein Design, keine Benutzeroberfläche. Nur eine Zeile: *"It works! Synapse is running."*
+
+Aber dahinter steckt mehr, als man auf den ersten Blick sieht.
+
+---
+
+## Was ist Matrix überhaupt?
+
+Matrix ist ein offenes, dezentrales Kommunikationsprotokoll. Dezentral bedeutet: kein einzelnes Unternehmen kontrolliert die Infrastruktur. Offen bedeutet: jeder kann einen eigenen Server betreiben, eigene Clients bauen, eigene Integrationen schreiben.
+
+Für Endnutzer klingt das technisch. Für mich als Entwickler ist es ein Traum.
+
+---
+
+## Warum nicht WhatsApp, Telegram oder Slack?
+
+Kurze Antwort: Weil ich keine Kontrolle darüber habe.
+
+Lange Antwort: Wenn ein KI-Agent im Namen eines Unternehmens kommuniziert — Termine vereinbart, Nachrichten sendet, Workflows auslöst — dann will ich wissen wo diese Daten liegen. Ich will nicht von einer API abhängig sein die morgen kostenpflichtig wird oder ihre Bedingungen ändert.
+
+Matrix läuft auf meinem Server. Die Daten liegen in Wien. Der Code ist Open Source. Kein Lock-in.
+
+---
+
+## Was das für die Agenten bedeutet
+
+Stell dir vor, du hast zwei Mitarbeiter — nennen wir sie Flo und Sabrina. Beide arbeiten bei verschiedenen Kunden, beide haben einen eigenen KI-Assistenten.
+
+Flo sagt zu seinem Agenten: *"Mach mir einen Termin mit Sabrina nächste Woche."*
+
+Was jetzt passiert, passiert unsichtbar:
+
+```
+Agent Flo → Matrix Room → Agent Sabrina
+"Wann hat Sabrina Zeit?"
+
+Agent Sabrina → fragt Sabrina → "Di 14:00 oder Mi 10:00"
+
+Agent Sabrina → Matrix Room → Agent Flo
+"Dienstag 14:00 oder Mittwoch 10:00 möglich"
+
+Agent Flo → fragt Flo → "Dienstag passt"
+
+Agent Flo → erstellt Kalendereinladung
+→ schickt .ics an Flo und Sabrina
+→ beide haben den Termin im Kalender
+```
+
+Kein Mensch hat auch nur eine E-Mail geschrieben. Kein Mensch hat einen Kalender geöffnet.
+
+Matrix ist dabei die Nervenbahn — das Protokoll über das sich die Agenten untereinander absprechen, koordinieren, und Aufgaben delegieren.
+
+---
+
+## Wie wir es aufgebaut haben
+
+Die technische Basis ist bewusst einfach gehalten:
+
+- **Proxmox** als Hypervisor — alle Dienste laufen auf meinem Heimserver
+- **Nginx Proxy Manager** als Reverse Proxy — übernimmt SSL, leitet Anfragen weiter
+- **Matrix Synapse** als Homeserver — das eigentliche Herzstück
+- **acme-dns** für SSL-Zertifikate — ohne Port 80, ohne externe Abhängigkeit
+
+Das Schöne daran: Die gesamte Kommunikation zwischen Agenten bleibt im eigenen System. Kein Traffic geht durch fremde Server.
+
+---
+
+## Was als Nächstes kommt
+
+Aktuell läuft Matrix im Hintergrund. Die Agenten können bereits Nachrichten senden und empfangen. Der nächste Schritt ist eine eigene Chat-Oberfläche — kein Element, kein Fremdsystem, sondern eine native SyntiqAI-UI die direkt in die Plattform integriert ist.
+
+Kunden sollen ihren Agenten nicht in einer externen App suchen müssen. Sie sollen ihn dort finden, wo sie ohnehin arbeiten.
+
+Das ist die Vision. Die Infrastruktur dafür steht seit heute.
