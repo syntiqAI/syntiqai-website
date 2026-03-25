@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic' // always fetch fresh from Redis
 
 export default async function BlogIndex() {
   const allPosts = getAllPosts('blog', true)
-  const overrides = await getAllBlogPublishOverrides()
+  const overrides = await getAllBlogPublishOverrides(allPosts.map(p => p.slug))
 
   const posts = allPosts
     .map(p => ({

@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
   }
 
   const posts = getAllPosts('blog', true)
-  const overrides = await getAllBlogPublishOverrides()
+  const overrides = await getAllBlogPublishOverrides(posts.map(p => p.slug))
   const result = posts.map(p => ({
     ...p,
     published: overrides[p.slug] !== undefined ? overrides[p.slug] : (p.published ?? true),

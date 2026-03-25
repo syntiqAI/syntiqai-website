@@ -95,20 +95,29 @@ export async function deleteTask(id: string): Promise<void> {
 
 // ─── Blog Publication ────────────────────────────────────────────────────────
 
-// All publish overrides stored in one hash: blog:publish_overrides → { slug: boolean }
 export async function getBlogPublishStatus(slug: string): Promise<boolean | null> {
-  const all = await redis.hget<boolean>('blog:publish_overrides', slug)
-  return all ?? null
+  const val = await redis.get<string>(`blog:pub:${slug}`)
+  if (val === null || val === undefined) return null
+  return val === 'true' || val === true as unknown as string
 }
 
 export async function setBlogPublishStatus(slug: string, published: boolean): Promise<void> {
-  await redis.hset('blog:publish_overrides', { [slug]: published })
+  await redis.set(`blog:pub:${slug}`, published ? 'true' : 'false')
 }
 
-export async function getAllBlogPublishOverrides(): Promise<Record<string, boolean>> {
+export async function getAllBlogPublishOverrides(slugs: string[]): Promise<Record<string, boolean>> {
+  if (!slugs.length) return {}
   try {
-    const all = await redis.hgetall<Record<string, boolean>>('blog:publish_overrides')
-    return all ?? {}
+    const results = await Promise.all(
+      slugs.map(slug => redis.get<string>(`blog:pub:${slug}`).then(val => ({ slug, val })))
+    )
+    const out: Record<string, boolean> = {}
+    for (const { slug, val } of results) {
+      if (val !== null && val !== undefined) {
+        out[slug] = val === 'true' || val === true as unknown as string
+      }
+    }
+    return out
   } catch {
     return {}
   }
