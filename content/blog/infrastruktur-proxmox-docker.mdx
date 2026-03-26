@@ -1,0 +1,79 @@
+---
+title: "Wie wir unsere KI-Infrastruktur aufgebaut haben"
+date: "2026-03-26"
+author: "Thomas Zach"
+excerpt: "Von der leeren VM bis zur laufenden Agenten-Infrastruktur: Wie wir auf Basis von Proxmox und Docker eine skalierbare Grundlage für SyntiqAI gebaut haben — und warum wir es genau so gemacht haben."
+image: "/blog/infrastruktur-proxmox-docker.png"
+imageAlt: "Zentrale VM mit isolierten Docker-Containern pro Kunde"
+published: false
+---
+
+Irgendwann kommt der Moment, wo man aufhört zu planen und anfängt zu bauen.
+
+Heute war dieser Moment.
+
+Wir haben die Infrastruktur hochgezogen, auf der SyntiqAI-Agenten für Kunden laufen werden. Kein Proof of Concept, keine Demo-Umgebung — das echte Fundament.
+
+---
+
+## Die Ausgangslage
+
+Wir betreiben einen eigenen Proxmox-Server zuhause. Darauf laufen bereits mehrere VMs — Home Assistant, ein Gameserver, unser Matrix-Chat-Server.
+
+Die Idee: Die gleiche Hardware, die wir sowieso haben, wird zur Grundlage für die Kunden-Infrastruktur. Keine monatlichen Cloud-Kosten, volle Kontrolle, Daten bleiben im eigenen Netz.
+
+Später können wir auf Cloud umziehen oder hybrid betreiben. Aber der Start passiert hier.
+
+---
+
+## Eine VM, viele Container
+
+Die erste Entscheidung war: Wie isolieren wir Kunden voneinander?
+
+Wir hätten für jeden Kunden eine eigene VM anlegen können. Maximale Isolation, aber auch maximaler Ressourcenverbrauch.
+
+Wir haben uns anders entschieden: **Eine VM, Docker-Container pro Kunde.**
+
+Die VM bekommt einen festen Pool an Hardware-Ressourcen — 4 CPU-Kerne, 8 GB RAM, 40 GB Speicher. Alle Container darin teilen sich diesen Pool. Wer gerade mehr braucht, bekommt mehr. Automatisch, ohne Konfiguration.
+
+Jeder Kunde bekommt seinen eigenen Container. Darin laufen seine Agenten. Die Daten eines Kunden kommen nie mit denen eines anderen Kunden in Berührung.
+
+---
+
+## Was in jedem Container steckt
+
+Nicht jede Anfrage ist gleich schwer. Ein Agent, der einen Kalendertermin koordiniert, braucht andere Ressourcen als einer, der ein 30-seitiges Dokument analysiert.
+
+Deshalb gibt es zwei Ebenen:
+
+**Lightweight Agents** — immer aktiv, reagieren sofort, erledigen den Alltag. Günstige Modelle, schnelle Antworten.
+
+**Ein Heavy Sub-Agent** — tritt nur auf den Plan, wenn eine Aufgabe wirklich komplex wird. Stärkeres Modell, mehr Kapazität, nur wenn nötig.
+
+Dazwischen sitzt ein Proxy-Service, der jeden LLM-Aufruf aufzeichnet: Welcher Agent hat angefragt? Wie viele Tokens? Was hat es gekostet? Das ist die Grundlage für Transparenz gegenüber dem Kunden — und für unsere eigene Kostenkontrolle.
+
+---
+
+## Selbst gehostet — aber bereit für die Cloud
+
+Alles läuft auf unserer Hardware. Das hat einen klaren Vorteil: Wir wissen genau, wo die Daten sind.
+
+Für viele österreichische Unternehmen ist das kein Detail, sondern eine Anforderung. Datenschutz, Compliance, interne Richtlinien — die Frage "Wo liegen unsere Daten?" wird gestellt. Wir können sie beantworten.
+
+Gleichzeitig haben wir von Anfang an mit Docker gebaut. Das bedeutet: Wenn ein Kunde seine Umgebung lieber auf eigener Hardware betreiben will, können wir das gleiche Setup portieren. Gleiches Image, eigener Server. Keine Abhängigkeit von uns.
+
+Und wenn wir irgendwann in die Cloud skalieren wollen — der Umzug ist kein Neuaufbau, sondern ein Deployment.
+
+---
+
+## Was als nächstes kommt
+
+Die Infrastruktur steht. Der erste echte Test folgt: TechFlow als Pilot-Kunde. Einen Container aufsetzen, erste Agenten konfigurieren, den Proxy mit echten Daten befüllen.
+
+Dann folgt der Oversight-Agent — der Teil, der die Logs auswertet und meldet, wenn etwas nicht stimmt.
+
+Schritt für Schritt. Aber auf einem soliden Fundament.
+
+---
+
+*SyntiqAI baut AI-Infrastruktur für österreichische Unternehmen — selbst gehostet, transparent, DSGVO-konform. Wenn dich das interessiert, melde dich.*
