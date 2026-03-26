@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 
+const AGENT_API = 'http://192.168.178.107:8001'
+
 interface Agent {
   id: string
   name: string
@@ -51,7 +53,7 @@ export default function AgentDashboard() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/agents')
+      const res = await fetch(`${AGENT_API}/agents`, { cache: 'no-store' })
       if (res.ok) setAgents(await res.json())
     } finally {
       setLoading(false)
@@ -66,7 +68,7 @@ export default function AgentDashboard() {
 
   async function doAction(name: string, action: 'start' | 'stop') {
     setActionLoading(name + action)
-    await fetch(`/api/admin/agents/${name}/${action}`, { method: 'POST' })
+    await fetch(`${AGENT_API}/agents/${name}/${action}`, { method: 'POST' })
     await load()
     setActionLoading(null)
   }
@@ -74,7 +76,7 @@ export default function AgentDashboard() {
   async function openLogs(name: string) {
     setLogLoading(true)
     setLogModal({ name, logs: '' })
-    const res = await fetch(`/api/admin/agents/${name}/logs`)
+    const res = await fetch(`${AGENT_API}/agents/${name}/logs?lines=100`, { cache: 'no-store' })
     if (res.ok) {
       const data = await res.json()
       setLogModal({ name, logs: data.logs || '(keine Logs)' })
