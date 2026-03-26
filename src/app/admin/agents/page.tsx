@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 
-const AGENT_API = 'http://192.168.178.107:8001'
+const AGENT_API = 'https://agents.syntiq-ai.at'
 
 interface Agent {
   id: string
