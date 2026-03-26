@@ -1,0 +1,92 @@
+---
+title: "Warum wir Python statt JavaScript gewählt haben"
+date: "2026-03-26"
+author: "Thomas Zach"
+excerpt: "Technologie-Entscheidungen sind selten schwarz-weiß. Warum wir für die Kern-Infrastruktur unserer Agenten-Plattform bewusst einen zweiten Tech-Stack einführen — und warum das die richtige Wahl ist."
+image: "/blog/warum-python-fastapi.png"
+imageAlt: "Zwei leuchtende Wege an einem Scheideweg"
+published: false
+---
+
+Wer ein System baut, trifft ständig Entscheidungen, die nach außen unsichtbar sind.
+
+Welche Datenbank? Welche Programmiersprache? Welches Framework? Die meisten davon werden nie in einem Blogpost landen.
+
+Diese schon — weil sie etwas Grundsätzliches zeigt: Manchmal ist die unbequemere Entscheidung die richtigere.
+
+---
+
+## Der Kontext
+
+Wir bauen gerade die Kern-Infrastruktur unserer Agenten-Plattform. Ein zentraler Baustein ist ein **Proxy-Service** — eine Middleware, die zwischen unseren KI-Agenten und dem LLM-Anbieter sitzt.
+
+Sie macht drei Dinge:
+1. Jeden LLM-Request weiterleiten
+2. Verbrauch und Kosten mitschreiben
+3. Daten für den Oversight-Agenten bereitstellen
+
+Die naheliegende Wahl wäre gewesen: JavaScript. Unsere Website läuft auf Next.js, wir kennen den Stack, es wäre ein Werkzeug weniger.
+
+Wir haben trotzdem Python gewählt.
+
+---
+
+## Was der Proxy heute macht
+
+Technisch gesehen ist ein Proxy simpel. Request rein, weiterleiten, Response zurückgeben, dabei mitschreiben. Das kann jede Sprache.
+
+Für diesen Teil wäre JavaScript völlig ausreichend gewesen.
+
+Aber ein Proxy ist nicht der Endpunkt. Er ist der Anfang.
+
+---
+
+## Was danach kommt
+
+Der eigentliche Wert liegt nicht im Weiterleiten — sondern in dem, was mit den gesammelten Daten passiert.
+
+Ein Oversight-Agent soll diese Logs auswerten. Er soll Muster erkennen: Welche Agenten arbeiten wie viel? Wann gibt es Auffälligkeiten? Wo steigen die Kosten überproportional?
+
+Das ist Datenanalyse. Und für Datenanalyse ist Python seit Jahren das Zuhause der besten Werkzeuge.
+
+Nicht weil JavaScript das nicht könnte — sondern weil das Ökosystem in Python deutlich ausgereifter ist. Bibliotheken für Zeitreihen, Anomalie-Erkennung, statistische Auswertung: alles vorhanden, alles erprobt.
+
+---
+
+## Die eigentliche Frage
+
+Bei Technologie-Entscheidungen stellt man sich oft die falsche Frage: *"Was kann ich damit bauen?"*
+
+Die richtigere Frage ist: *"Wohin entwickelt sich das System?"*
+
+Wenn wir nur einen Proxy bräuchten, wäre JavaScript die richtige Wahl gewesen. Aber wir bauen ein System, das mit der Zeit intelligenter werden soll. Das Logs nicht nur speichert, sondern versteht. Das nicht nur weiterleitet, sondern lernt.
+
+Für diesen Weg ist Python besser gerüstet.
+
+---
+
+## Der Preis
+
+Das ist keine kostenlose Entscheidung.
+
+Ein zweiter Tech-Stack bedeutet mehr Komplexität. Mehr Abhängigkeiten. Ein weiteres Ding, das laufen, gewartet und verstanden werden muss.
+
+Wir nehmen diesen Preis bewusst in Kauf — weil die Alternative teurer wäre: ein System, das irgendwann an seine eigenen Grenzen stößt und umgebaut werden muss.
+
+Frühzeitig die richtige Grundlage zu legen ist billiger als später umzubauen.
+
+---
+
+## Was das für die Plattform bedeutet
+
+Python/FastAPI übernimmt den Teil, der mit Daten arbeitet: Proxy, Logging, Auswertung, Alerts.
+
+JavaScript/Next.js bleibt dort, wo es hingehört: die Website, das Admin-Interface, die Benutzeroberfläche.
+
+Zwei Stacks — jeder dort, wo er am stärksten ist.
+
+Keine der beiden Entscheidungen ist eine Kompromisslösung. Beide sind bewusste Wahlen für das, was sie am besten können.
+
+---
+
+*Das sind die Entscheidungen, die man beim Aufbau einer ernsthaften Plattform trifft. Nicht immer die einfachsten — aber die, die sich auf Dauer auszahlen.*
