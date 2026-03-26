@@ -26,6 +26,7 @@ export default async function AdminPage() {
       {/* Quick nav */}
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
         {[
+          { href: '/admin/agents', label: '🤖 Agent Dashboard', desc: 'Docker Container' },
           { href: '/admin/blog', label: '✍️ Blog-Verwaltung', desc: 'Entwürfe freigeben' },
           { href: '/admin/tasks', label: '📋 Aufgaben', desc: 'Task-Board' },
           { href: '/admin/settings', label: '⚙️ Einstellungen', desc: 'Profil & Passwort' },
