@@ -1,0 +1,253 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 960" width="820" height="960">
+  <defs>
+    <!-- App gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1035"/>
+      <stop offset="55%" style="stop-color:#1e1245"/>
+      <stop offset="100%" style="stop-color:#0f0828"/>
+    </linearGradient>
+    <linearGradient id="tile1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c026d3;stop-opacity:0.85"/>
+      <stop offset="100%" style="stop-color:#818cf8;stop-opacity:0.65"/>
+    </linearGradient>
+    <linearGradient id="tile2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#c026d3;stop-opacity:0.55"/>
+    </linearGradient>
+    <linearGradient id="tile3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:0.75"/>
+      <stop offset="100%" style="stop-color:#34d399;stop-opacity:0.55"/>
+    </linearGradient>
+    <linearGradient id="tile4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34d399;stop-opacity:0.75"/>
+      <stop offset="100%" style="stop-color:#818cf8;stop-opacity:0.55"/>
+    </linearGradient>
+    <linearGradient id="tile5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#818cf8;stop-opacity:0.75"/>
+      <stop offset="100%" style="stop-color:#38bdf8;stop-opacity:0.55"/>
+    </linearGradient>
+    <linearGradient id="phoneBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3a3a3c"/>
+      <stop offset="40%" style="stop-color:#2c2c2e"/>
+      <stop offset="100%" style="stop-color:#1c1c1e"/>
+    </linearGradient>
+    <linearGradient id="phoneSide" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#48484a"/>
+      <stop offset="50%" style="stop-color:#636366"/>
+      <stop offset="100%" style="stop-color:#3a3a3c"/>
+    </linearGradient>
+    <linearGradient id="chatGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1035;stop-opacity:0"/>
+      <stop offset="30%" style="stop-color:#1a1035;stop-opacity:0.95"/>
+      <stop offset="100%" style="stop-color:#0f0828;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="zbadge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c026d3"/>
+      <stop offset="100%" style="stop-color:#818cf8"/>
+    </linearGradient>
+    <linearGradient id="morningGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316;stop-opacity:0.6"/>
+      <stop offset="50%" style="stop-color:#c026d3;stop-opacity:0.5"/>
+      <stop offset="100%" style="stop-color:#818cf8;stop-opacity:0.7"/>
+    </linearGradient>
+
+    <!-- Shadows -->
+    <filter id="phoneShadow" x="-30%" y="-15%" width="160%" height="130%">
+      <feDropShadow dx="0" dy="20" stdDeviation="30" flood-color="#000000" flood-opacity="0.6"/>
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#c026d3" flood-opacity="0.15"/>
+    </filter>
+    <filter id="tileGlow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Screen clip -->
+    <clipPath id="screenClip">
+      <rect x="8" y="12" width="374" height="816" rx="40" ry="40"/>
+    </clipPath>
+    <!-- Full phone clip -->
+    <clipPath id="phoneClip">
+      <rect x="0" y="0" width="390" height="844" rx="47" ry="47"/>
+    </clipPath>
+  </defs>
+
+  <!-- Canvas background -->
+  <rect width="820" height="960" fill="#0a0615"/>
+
+  <!-- Ambient background glows on canvas -->
+  <ellipse cx="250" cy="300" rx="200" ry="180" fill="#c026d3" opacity="0.04"/>
+  <ellipse cx="600" cy="700" rx="180" ry="150" fill="#818cf8" opacity="0.04"/>
+
+  <!-- ======================================================= -->
+  <!-- PHONE GROUP — rotated -16deg, centered on canvas        -->
+  <!-- ======================================================= -->
+  <g transform="translate(410, 480) rotate(-16) translate(-195, -422)" filter="url(#phoneShadow)">
+
+    <!-- iPhone 17 Air outer body -->
+    <rect x="0" y="0" width="390" height="844" rx="47" ry="47" fill="url(#phoneBody)"/>
+
+    <!-- Thin titanium edge shine (top) -->
+    <rect x="2" y="2" width="386" height="840" rx="46" ry="46" fill="none" stroke="rgba(200,200,210,0.18)" stroke-width="1.5"/>
+    <!-- Inner screen border -->
+    <rect x="6" y="8" width="378" height="828" rx="43" ry="43" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="2"/>
+
+    <!-- ── SCREEN ── -->
+    <g clip-path="url(#screenClip)">
+
+      <!-- App background -->
+      <rect x="8" y="12" width="374" height="816" fill="url(#bgGrad)"/>
+
+      <!-- Ambient glow top right -->
+      <ellipse cx="310" cy="90" rx="130" ry="90" fill="#c026d3" opacity="0.08"/>
+      <!-- Ambient glow bottom left -->
+      <ellipse cx="70" cy="720" rx="110" ry="90" fill="#818cf8" opacity="0.06"/>
+
+      <!-- Status bar -->
+      <rect x="8" y="12" width="374" height="52" fill="rgba(26,16,53,0.7)"/>
+      <text x="30" y="44" font-family="-apple-system, SF Pro Display, Helvetica, sans-serif" font-size="15" font-weight="600" fill="#f0ecff">9:41</text>
+      <!-- Battery -->
+      <rect x="332" y="30" width="30" height="14" rx="3.5" fill="none" stroke="rgba(240,236,255,0.8)" stroke-width="1.5"/>
+      <rect x="334" y="32" width="22" height="10" rx="2" fill="#34d399"/>
+      <rect x="362" y="35" width="3" height="5" rx="1.5" fill="rgba(240,236,255,0.5)"/>
+      <!-- Signal dots -->
+      <circle cx="300" cy="37" r="3" fill="rgba(240,236,255,0.9)"/>
+      <circle cx="311" cy="37" r="3" fill="rgba(240,236,255,0.9)"/>
+      <circle cx="322" cy="37" r="3" fill="rgba(240,236,255,0.4)"/>
+
+      <!-- Dynamic Island -->
+      <rect x="148" y="18" width="94" height="28" rx="14" fill="#000000"/>
+      <!-- Camera dot in DI -->
+      <circle cx="222" cy="32" r="5" fill="#1a1a1a"/>
+      <circle cx="222" cy="32" r="2.5" fill="#0a0a0a"/>
+      <circle cx="222" cy="32" r="1" fill="#2a2a2a"/>
+
+      <!-- ── HEADER ── -->
+      <!-- Z badge -->
+      <rect x="20" y="76" width="38" height="38" rx="12" fill="url(#zbadge)"/>
+      <text x="39" y="101" font-family="-apple-system, SF Pro Display, Helvetica, sans-serif" font-size="18" font-weight="900" fill="#ffffff" text-anchor="middle">Z</text>
+
+      <!-- Greeting -->
+      <text x="70" y="90" font-family="-apple-system, SF Pro Display, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#f0ecff">Guten Morgen! 👋</text>
+      <!-- Context chip -->
+      <rect x="70" y="97" width="136" height="22" rx="11" fill="rgba(249,115,22,0.15)"/>
+      <rect x="70" y="97" width="136" height="22" rx="11" fill="none" stroke="rgba(249,115,22,0.45)" stroke-width="1"/>
+      <circle cx="83" cy="108" r="4" fill="#f97316"/>
+      <text x="93" y="113" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" font-weight="500" fill="#f97316">19°C · Donnerstag</text>
+
+      <!-- Subtitle -->
+      <text x="20" y="138" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="13" fill="rgba(200,195,240,0.6)">Ich hätte ein paar Ideen für dich ✨</text>
+
+      <!-- Section label -->
+      <text x="20" y="165" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" font-weight="600" fill="rgba(200,195,240,0.35)" letter-spacing="1.2">VORSCHLÄGE</text>
+
+      <!-- ── TILE 1 — Large full-width (Morning / Weather) ── -->
+      <rect x="20" y="175" width="350" height="148" rx="24" fill="url(#morningGrad)"/>
+      <!-- Inner texture -->
+      <ellipse cx="320" cy="215" rx="90" ry="65" fill="rgba(255,255,255,0.04)"/>
+      <ellipse cx="50" cy="280" rx="55" ry="40" fill="rgba(0,0,0,0.08)"/>
+      <!-- Icon + title -->
+      <text x="36" y="213" font-size="22">☀️</text>
+      <text x="66" y="213" font-family="-apple-system, SF Pro Display, Helvetica, sans-serif" font-size="16" font-weight="700" fill="#ffffff">Perfektes Wetter heute</text>
+      <text x="36" y="233" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="12" fill="rgba(255,255,255,0.75)">19°C · kaum Wind · Nachmittag frei?</text>
+      <!-- Suggestion badge -->
+      <rect x="36" y="243" width="130" height="24" rx="12" fill="rgba(255,255,255,0.12)"/>
+      <text x="101" y="259" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="12" font-weight="500" fill="rgba(255,255,255,0.9)" text-anchor="middle">Spaziergang vorschlagen</text>
+      <!-- Feedback -->
+      <text x="252" y="259" font-size="18">👍</text>
+      <text x="292" y="259" font-size="18">👎</text>
+      <!-- Bottom bar - agent note -->
+      <rect x="20" y="279" width="350" height="44" rx="0 0 24 24" fill="rgba(0,0,0,0.18)"/>
+      <text x="36" y="296" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.55)">🤖 Laut Vorhersage bleibt es heute ganztags sonnig</text>
+      <text x="36" y="310" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="10" fill="rgba(255,255,255,0.55)">und trocken — ideal für eine Pause draußen.</text>
+
+      <!-- ── TILE 2 — Small left (Lunch) ── -->
+      <rect x="20" y="336" width="163" height="132" rx="24" fill="url(#tile2)"/>
+      <ellipse cx="150" cy="350" rx="55" ry="40" fill="rgba(255,255,255,0.04)"/>
+      <text x="36" y="375" font-size="24">🍽️</text>
+      <text x="36" y="400" font-family="-apple-system, SF Pro Display, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#ffffff">Mittagspause</text>
+      <text x="36" y="417" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">Empfehlung 350m</text>
+      <text x="36" y="432" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">entfernt · 4,7 ⭐</text>
+      <text x="132" y="457" font-size="14">👍</text>
+      <text x="158" y="457" font-size="14">👎</text>
+
+      <!-- ── TILE 3 — Small right (Groceries) ── -->
+      <rect x="207" y="336" width="163" height="132" rx="24" fill="url(#tile3)"/>
+      <ellipse cx="215" cy="350" rx="40" ry="30" fill="rgba(255,255,255,0.04)"/>
+      <text x="223" y="375" font-size="24">🛒</text>
+      <text x="223" y="400" font-family="-apple-system, SF Pro Display, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#ffffff">Einkaufen</text>
+      <text x="223" y="417" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">Milch · Brot · Eier</text>
+      <text x="223" y="432" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">fast leer</text>
+      <text x="318" y="457" font-size="14">👍</text>
+      <text x="344" y="457" font-size="14">👎</text>
+
+      <!-- ── TILE 4 — Small left (Sport) ── -->
+      <rect x="20" y="481" width="163" height="112" rx="24" fill="url(#tile4)"/>
+      <text x="36" y="517" font-size="24">💪</text>
+      <text x="36" y="542" font-family="-apple-system, SF Pro Display, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#ffffff">Bewegung</text>
+      <text x="36" y="558" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">30 Min · perfektes</text>
+      <text x="36" y="572" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">Wetter dafür</text>
+      <text x="132" y="584" font-size="14">👍</text>
+      <text x="158" y="584" font-size="14">👎</text>
+
+      <!-- ── TILE 5 — Small right (Evening) ── -->
+      <rect x="207" y="481" width="163" height="112" rx="24" fill="url(#tile5)"/>
+      <text x="223" y="517" font-size="24">🎬</text>
+      <text x="223" y="542" font-family="-apple-system, SF Pro Display, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#ffffff">Heute Abend</text>
+      <text x="223" y="558" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">Neuer Film</text>
+      <text x="223" y="572" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="11" fill="rgba(255,255,255,0.7)">verfügbar</text>
+      <text x="318" y="584" font-size="14">👍</text>
+      <text x="344" y="584" font-size="14">👎</text>
+
+      <!-- ── BOTTOM AREA ── -->
+      <!-- Fade overlay -->
+      <rect x="8" y="590" width="374" height="238" fill="url(#chatGrad)"/>
+
+      <!-- Nav dots -->
+      <circle cx="155" cy="760" r="4" fill="rgba(129,140,248,0.8)"/>
+      <circle cx="170" cy="760" r="3" fill="rgba(129,140,248,0.35)"/>
+      <circle cx="183" cy="760" r="3" fill="rgba(129,140,248,0.35)"/>
+      <circle cx="220" cy="760" r="3" fill="rgba(129,140,248,0.35)"/>
+      <circle cx="233" cy="760" r="3" fill="rgba(129,140,248,0.35)"/>
+
+      <!-- Chat input -->
+      <rect x="20" y="776" width="285" height="46" rx="23" fill="rgba(255,255,255,0.05)" stroke="rgba(129,140,248,0.28)" stroke-width="1"/>
+      <text x="44" y="803" font-family="-apple-system, SF Pro Text, Helvetica, sans-serif" font-size="14" fill="rgba(200,195,240,0.38)">Frag mich was …</text>
+
+      <!-- Mic button -->
+      <circle cx="333" cy="799" r="21" fill="rgba(129,140,248,0.1)" stroke="rgba(129,140,248,0.28)" stroke-width="1"/>
+      <text x="333" y="806" font-family="-apple-system" font-size="16" fill="#818cf8" text-anchor="middle">🎤</text>
+
+      <!-- Send button -->
+      <circle cx="372" cy="799" r="18" fill="url(#zbadge)"/>
+      <!-- Arrow icon -->
+      <polygon points="364,799 372,793 380,799 372,805" fill="none" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+      <line x1="372" y1="793" x2="372" y2="805" stroke="white" stroke-width="1.8"/>
+
+      <!-- Home indicator -->
+      <rect x="148" y="826" width="94" height="4" rx="2" fill="rgba(240,236,255,0.25)"/>
+
+    </g>
+
+    <!-- Phone edge shine (left side — very thin for iPhone 17 Air) -->
+    <rect x="0" y="0" width="390" height="844" rx="47" ry="47" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+    <!-- Action button (left, upper) — iPhone 17 Air feature -->
+    <rect x="-3" y="168" width="6" height="32" rx="3" fill="#3a3a3c"/>
+    <rect x="-3" y="168" width="4" height="32" rx="3" fill="#48484a"/>
+
+    <!-- Volume buttons (left) -->
+    <rect x="-3" y="220" width="5" height="48" rx="2.5" fill="#3a3a3c"/>
+    <rect x="-3" y="220" width="3" height="48" rx="2.5" fill="#444446"/>
+    <rect x="-3" y="282" width="5" height="48" rx="2.5" fill="#3a3a3c"/>
+    <rect x="-3" y="282" width="3" height="48" rx="2.5" fill="#444446"/>
+
+    <!-- Power button (right) -->
+    <rect x="388" y="215" width="5" height="68" rx="2.5" fill="#3a3a3c"/>
+    <rect x="390" y="215" width="3" height="68" rx="2.5" fill="#444446"/>
+
+  </g>
+
+  <!-- Zeal wordmark bottom -->
+  <text x="410" y="920" font-family="-apple-system, SF Pro Display, Helvetica, sans-serif" font-size="26" font-weight="800" fill="rgba(200,195,240,0.18)" text-anchor="middle" letter-spacing="8">ZEAL</text>
+
+</svg>
